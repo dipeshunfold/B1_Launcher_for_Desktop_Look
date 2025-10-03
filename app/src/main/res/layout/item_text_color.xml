@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/_5sdp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="@drawable/foreground_ripple_effect">
+
+    <View
+        android:id="@+id/text_color_view"
+        android:layout_width="@dimen/_40sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_margin="@dimen/_2sdp"
+        android:background="@drawable/color_swatch_background"
+        android:elevation="@dimen/_1sdp" />
+
+    <ImageView
+        android:id="@+id/text_checkmark"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:backgroundTint="@color/light_gray"
+        android:elevation="@dimen/_1sdp"
+        android:src="@drawable/ic_checkmark"
+        android:visibility="gone" />
+</FrameLayout>

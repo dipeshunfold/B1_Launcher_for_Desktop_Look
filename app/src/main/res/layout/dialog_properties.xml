@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/_10sdp"
+    android:background="@drawable/bg_fragment_launcher"
+    android:elevation="@dimen/_1sdp"
+    android:orientation="vertical"
+    android:padding="@dimen/_10sdp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/dialog_icon"
+            android:layout_width="@dimen/_30sdp"
+            android:layout_height="@dimen/_30sdp"
+            android:src="@drawable/ic_doccuement"
+            app:tint="?attr/colorPrimary" />
+
+        <TextView
+            android:id="@+id/dialog_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/_10sdp"
+            android:fontFamily="@font/arimo_bold_font"
+
+
+            android:text="Properties"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="?android:attr/textColorPrimary" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/dialog_file_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+
+
+        android:singleLine="true"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="?android:attr/textColorPrimary"
+        tools:text="really_long_file_name_goes_here_to_test_ellipsize.jpg" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_1sdp"
+        android:layout_marginVertical="@dimen/_10sdp"
+        android:background="?android:attr/listDivider" />
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="1">
+
+        <TableRow android:layout_marginBottom="@dimen/_5sdp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/arimo_regular_font"
+
+
+                android:text="Type:"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/dialog_file_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_10sdp"
+
+                android:textColor="@color/black"
+
+                tools:text="JPEG Image" />
+        </TableRow>
+
+        <TableRow android:layout_marginBottom="@dimen/_5sdp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/arimo_regular_font"
+
+
+                android:text="Size:"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/dialog_file_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_10sdp"
+
+
+                android:textColor="@color/black"
+
+                tools:text="162 KB (165,888 bytes)" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/dialog_row_dimensions"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/arimo_regular_font"
+
+
+                android:text="Dimensions:"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/dialog_dimensions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_10sdp"
+
+
+                android:textColor="@color/black"
+
+                tools:text="1080 x 1920 pixels" />
+        </TableRow>
+
+        <TableRow android:layout_marginBottom="@dimen/_5sdp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/arimo_regular_font"
+
+
+                android:text="Path:"
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/dialog_file_path"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_10sdp"
+                android:ellipsize="middle"
+
+
+                android:singleLine="true"
+                android:textColor="@color/black"
+
+                tools:text="/storage/emulated/0/Pictures/Subfolder" />
+        </TableRow>
+
+        <TableRow android:layout_marginBottom="@dimen/_5sdp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/arimo_regular_font"
+
+
+                android:text="Modified:"
+
+                android:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/dialog_modified_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/_10sdp"
+
+
+                android:textColor="@color/black"
+
+                tools:text="Jul 02, 2025, 5:43:00 PM" />
+        </TableRow>
+    </TableLayout>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/dialog_ok_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/_10sdp"
+        android:background="@drawable/bg_fragment_launcher"
+        android:backgroundTint="@color/colorPrimary"
+        android:clickable="true"
+        android:elevation="@dimen/_1sdp"
+
+        android:focusable="true"
+        android:foreground="@drawable/foreground_ripple_effect"
+        android:gravity="center"
+        android:text="Okay"
+        android:textAllCaps="false"
+        android:textColor="@color/white" />
+
+</LinearLayout>

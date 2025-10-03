@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/_10sdp"
+    android:layout_marginTop="@dimen/_5sdp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="@drawable/foreground_ripple_effect"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
+
+    <RadioButton
+        android:id="@+id/date_format_radio_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:buttonTint="@color/colorPrimary"
+        android:clickable="false"
+        android:focusable="false" />
+
+    <TextView
+        android:id="@+id/date_format_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:fontFamily="@font/roboto_medium"
+
+
+        android:text="dd/MM/yyyy"
+        android:textColor="@android:color/black"
+        android:textSize="@dimen/_13ssp" />
+
+</LinearLayout>

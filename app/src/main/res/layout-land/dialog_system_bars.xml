@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginVertical="@dimen/_10sdp"
+    android:layout_marginHorizontal="@dimen/_120sdp"
+    android:background="@drawable/bg_fragment_launcher"
+    android:elevation="@dimen/_1sdp"
+    android:orientation="vertical"
+    android:padding="@dimen/_10sdp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp"
+        android:fontFamily="@font/font_semibold"
+
+
+        android:text="Select an Option"
+        android:textColor="@color/colorPrimary"
+        android:textSize="@dimen/_15ssp" />
+
+    <RadioGroup
+        android:id="@+id/radio_group_system_bars"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RadioButton
+            android:id="@+id/radio_show_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/_5sdp"
+            android:buttonTint="@color/colorPrimary"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/arimo_regular_font"
+            android:foreground="@drawable/foreground_ripple_effect"
+            android:paddingStart="@dimen/_5sdp"
+            android:paddingEnd="@dimen/_5sdp"
+            android:text="Show Nav Keys &amp; Status Bar"
+            android:textSize="@dimen/_12ssp" />
+
+        <RadioButton
+            android:id="@+id/radio_hide_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/_5sdp"
+            android:buttonTint="@color/colorPrimary"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/arimo_regular_font"
+            android:foreground="@drawable/foreground_ripple_effect"
+            android:paddingStart="@dimen/_5sdp"
+            android:paddingEnd="@dimen/_5sdp"
+            android:text="Hide Nav Keys &amp; Status Bar"
+            android:textSize="@dimen/_12ssp" />
+
+        <RadioButton
+            android:id="@+id/radio_show_nav"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/_5sdp"
+            android:buttonTint="@color/colorPrimary"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/arimo_regular_font"
+            android:foreground="@drawable/foreground_ripple_effect"
+            android:paddingStart="@dimen/_5sdp"
+            android:paddingEnd="@dimen/_5sdp"
+            android:text="Show Navigation Keys &amp; Hide Status Bar"
+            android:textSize="@dimen/_12ssp" />
+
+        <RadioButton
+            android:id="@+id/radio_show_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/_5sdp"
+            android:buttonTint="@color/colorPrimary"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/arimo_regular_font"
+            android:foreground="@drawable/foreground_ripple_effect"
+            android:paddingStart="@dimen/_5sdp"
+            android:paddingEnd="@dimen/_5sdp"
+            android:text="Show Status Bar &amp; Hide Navigation Key"
+            android:textSize="@dimen/_12ssp" />
+
+    </RadioGroup>
+
+</LinearLayout>

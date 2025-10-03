@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Landscape-specific style adjustments to avoid overly wide dialogs on tablets/landscape -->
+
+    <!-- Re-declare LauncherMenuDialogTheme with landscape width constraints -->
+    <style name="LauncherMenuDialogTheme" parent="Theme.MaterialComponents.Light.Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">false</item>
+
+        <!-- Allow dialog to draw behind status and navigation bars -->
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <!-- For devices with display cutouts -->
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+
+        <!-- Landscape: set dialog min widths to prevent stretching full-width -->
+        <item name="android:windowMinWidthMajor">70%
+        </item> <!-- when in portrait (major = screen width) but used by system appropriately -->
+        <item name="android:windowMinWidthMinor">90%
+        </item> <!-- when in landscape (minor = screen height width dimension) -->
+    </style>
+
+    <!-- Optional: generic dialog width if you use default Material dialogs elsewhere -->
+</resources>

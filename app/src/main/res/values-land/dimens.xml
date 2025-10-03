@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <!-- Landscape overrides: scale down common sizes for a tighter UI on wide screens -->
+    <dimen name="bottom_sheet_horizontal_margin">@dimen/_100sdp</dimen>
+    <!-- dp sizes -->
+    <dimen name="_45sdp">36dp</dimen>
+    <dimen name="_30sdp">24dp</dimen>
+    <dimen name="_28sdp">22dp</dimen>
+    <dimen name="_25sdp">20dp</dimen>
+    <dimen name="_20sdp">16dp</dimen>
+    <dimen name="_18sdp">14dp</dimen>
+    <dimen name="_15sdp">12dp</dimen>
+    <dimen name="_12sdp">10dp</dimen>
+    <dimen name="_11sdp">9dp</dimen>
+    <dimen name="_10sdp">8dp</dimen>
+    <dimen name="_8sdp">6dp</dimen>
+    <dimen name="_6sdp">5dp</dimen>
+    <dimen name="_5sdp">4dp</dimen>
+    <dimen name="_4sdp">3dp</dimen>
+    <dimen name="_3sdp">2dp</dimen>
+    <dimen name="_2sdp">1dp</dimen>
+    <dimen name="_1sdp">1dp</dimen>
+
+    <!-- sp sizes -->
+    <dimen name="_15ssp">13sp</dimen>
+    <dimen name="_13ssp">11sp</dimen>
+    <dimen name="_12ssp">11sp</dimen>
+    <dimen name="_11ssp">10sp</dimen>
+    <dimen name="_10ssp">9sp</dimen>
+    <dimen name="_9ssp">8.5sp</dimen>
+    <dimen name="_8ssp">8sp</dimen>
+
+    <!-- Max content width to avoid stretching across very wide landscape screens -->
+    <dimen name="land_content_max_width">600dp</dimen>
+</resources>

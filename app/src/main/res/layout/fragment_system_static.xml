@@ -1,0 +1,180 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/_10sdp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:fontFamily="@font/arimo_bold_font"
+
+
+            android:text="System"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/_15ssp" />
+
+        <LinearLayout
+            android:id="@+id/setting_set_default"
+            style="@style/SettingsRowStyle"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="@drawable/foreground_ripple_effect">
+
+            <ImageView
+                style="@style/SettingsIconStyle"
+                android:src="@drawable/ic_homes" />
+
+            <TextView
+                style="@style/SettingsTextStyle"
+                android:text="Set Default Launcher" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="invisible"
+                android:foreground="@drawable/foreground_ripple_effect" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/setting_system_settings"
+            style="@style/SettingsRowStyle"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="@drawable/foreground_ripple_effect">
+
+            <ImageView
+                style="@style/SettingsIconStyle"
+                android:src="@drawable/ic_system_settings" />
+
+            <TextView
+                style="@style/SettingsTextStyle"
+                android:text="System Settings" />
+            <androidx.appcompat.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="invisible"
+                android:foreground="@drawable/foreground_ripple_effect" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/setting_notification_settings"
+            style="@style/SettingsRowStyle"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="@drawable/foreground_ripple_effect">
+
+            <ImageView
+                style="@style/SettingsIconStyle"
+                android:src="@drawable/ic_notifications" />
+
+            <TextView
+                style="@style/SettingsTextStyle"
+                android:text="Notification Settings" />
+            <androidx.appcompat.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="invisible"
+                android:foreground="@drawable/foreground_ripple_effect" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/setting_status_bar_layout"
+            style="@style/SettingsRowStyle"
+            android:clickable="true"
+            android:orientation="horizontal"
+            android:focusable="true"
+            android:foreground="@drawable/foreground_ripple_effect">
+
+            <ImageView
+                android:id="@+id/icon_status_bar"
+                style="@style/SettingsIconStyle"
+                android:src="@drawable/ic_status_bar" />
+
+            <TextView
+                style="@style/SettingsTextStyle"
+                android:layout_toEndOf="@id/icon_status_bar"
+                android:text="Show Status Bar &amp; Nav Keys" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="invisible"
+                android:foreground="@drawable/foreground_ripple_effect" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/setting_alerts_layout"
+            style="@style/SettingsRowStyle"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/icon_alerts"
+                style="@style/SettingsIconStyle"
+                android:src="@drawable/ic_alert" />
+
+            <TextView
+                style="@style/SettingsTextStyle"
+                android:layout_toEndOf="@id/icon_alerts"
+                android:text="Notification Alerts" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/setting_alerts_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/setting_startup_layout"
+            style="@style/SettingsRowStyle"
+
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/icon_startup"
+                style="@style/SettingsIconStyle"
+                android:src="@drawable/ic_startup" />
+
+            <TextView
+                style="@style/SettingsTextStyle"
+                android:layout_toEndOf="@id/icon_startup"
+                android:text="Launch at Phone Startup" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/setting_startup_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

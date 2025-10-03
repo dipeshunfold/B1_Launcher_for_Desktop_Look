@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="40dp">
+
+    <TextView
+        android:id="@+id/tv_day_cell"
+        style="@style/DayOfWeek"
+
+        android:layout_width="@dimen/_20sdp"
+        android:layout_height="@dimen/_20sdp"
+        android:layout_gravity="center"
+        android:fontFamily="@font/arimo_regular_font"
+        android:gravity="center"
+        android:textColor="@android:color/black"
+        android:textSize="@dimen/_12ssp"
+
+
+        tools:text="14" />
+</FrameLayout>

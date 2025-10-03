@@ -1,0 +1,117 @@
+plugins {
+    alias(libs.plugins.android.application)
+}
+
+android {
+    namespace 'com.bluelight.computer.winlauncher.prolauncher'
+    compileSdk 36
+
+
+    defaultConfig {
+        applicationId "com.bluelight.computer.winlauncher.prolauncher"
+        minSdk 25
+        targetSdk 36
+        versionCode 1
+        versionName "1.0"
+        renderscriptTargetApi 21
+        multiDexEnabled true
+
+        renderscriptSupportModeEnabled true
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += [
+                        "room.schemaLocation": "$projectDir/schemas".toString(),
+                        "room.incremental"   : "true"
+                ]
+            }
+        }
+    }
+
+    buildTypes {
+
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+        debug {
+            minifyEnabled false
+            debuggable true
+        }
+
+        debugWithProguard {
+            postprocessing {
+                removeUnusedCode true
+                obfuscate false
+                optimizeCode false
+            }
+            debuggable true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    
+    buildFeatures {
+        viewBinding true
+    }
+
+    android {
+        lintOptions {
+            checkReleaseBuilds false
+            abortOnError false
+        }
+    }
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+
+}
+
+dependencies {
+    implementation libs.appcompat
+    implementation libs.material
+    implementation libs.activity
+    implementation libs.constraintlayout
+    implementation libs.viewpager2
+    implementation libs.androidx.room.runtime
+    implementation libs.preference
+    annotationProcessor libs.room.compiler
+
+    implementation libs.dotsindicator
+    implementation libs.gridlayout
+    implementation libs.work.runtime
+
+    implementation libs.androidx.lifecycle.viewmodel.ktx
+    implementation libs.androidx.lifecycle.livedata.ktx
+
+    annotationProcessor libs.compiler
+
+    implementation libs.circleimageview
+    implementation libs.ssp.android
+    implementation libs.sdp.android
+
+    implementation libs.retrofit
+    implementation libs.converter.scalars
+
+    implementation libs.colorpicker
+    implementation libs.android.lottie
+    implementation libs.retrofit
+    implementation libs.converter.gson // If your API returns JSON
+
+
+
+    implementation libs.glide // Use the latest stable version
+    //noinspection NewerVersionAvailable
+    annotationProcessor libs.compiler.v505 // Must match Glide version
+
+    implementation libs.androidx.localbroadcastmanager // Use the latest stable version if different
+
+}

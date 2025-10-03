@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#00000000"
+    android:clickable="true"
+    android:focusable="true"
+    tools:context=".customlauncher.ui.fragment.RecentFragment">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/blur_background"
+        android:layout_width="@dimen/_150sdp"
+
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="@dimen/_10sdp"
+        android:scaleType="centerCrop"
+        android:visibility="invisible"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.Rounded" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/content_container"
+        android:layout_width="@dimen/_150sdp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="@dimen/_10sdp"
+
+        android:clickable="true"
+        android:elevation="@dimen/_2sdp"
+        android:focusable="true"
+        app:cardBackgroundColor="@android:color/transparent"
+        app:cardCornerRadius="@dimen/_10sdp"
+        app:cardElevation="0dp"
+        app:cardPreventCornerOverlap="false">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/glass_edge_background">
+
+            <TextView
+                android:id="@+id/txt"
+                style="@style/DayOfWeek"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:elevation="@dimen/_1sdp"
+                android:fontFamily="@font/arimo_regular_font"
+                android:gravity="center"
+                android:text="Recent Usage "
+
+                android:textColor="@color/black"
+
+                android:textSize="@dimen/_10ssp" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txt"
+                android:layout_margin="@dimen/_8sdp" />
+
+            <TextView
+                android:id="@+id/empty_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/txt"
+                android:layout_margin="@dimen/_8sdp"
+                android:gravity="center"
+                android:padding="@dimen/_10sdp"
+                android:text="No background apps running"
+                android:textColor="@color/black"
+                android:textSize="@dimen/_10ssp"
+                android:visibility="gone"
+                android:fontFamily="@font/arimo_regular_font" />
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
+
+</FrameLayout>

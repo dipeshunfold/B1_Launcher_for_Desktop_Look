@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Launcher for Desktop Look</string>
+
+
+    <string name="wallpaper_set_success">Wallpaper set successfully!</string>
+    <string name="wallpaper_set_failed">Failed to set wallpaper.</string>
+    <string name="setting_wallpaper">Setting wallpaper…</string>
+
+    <string name="intro_title_1">Your Phone, Reimagined</string>
+    <string name="intro_title_2">All Your Widgets, Always in View</string>
+    <string name="intro_title_3">Your Apps, the Smarter Way</string>
+    <string name="intro_desc_1">A desktop-style interface crafted for ease, clarity, and control.</string>
+    <string name="intro_desc_2">Built-in support for system and 3rd-party widgets in a desktop-style layout.</string>
+    <string name="intro_desc_3">Access everything you need from a PC-style Start Menu — fast, organized, and familiar.</string>
+    <string name="next">Next</string>
+</resources>

@@ -1,0 +1,81 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/_10sdp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:fontFamily="@font/arimo_bold_font"
+
+
+            android:text="Backup &amp; Restore"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/_15ssp" />
+
+        <LinearLayout
+            android:id="@+id/setting_backup_data"
+            style="@style/SettingsRowStyle"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="@drawable/foreground_ripple_effect">
+
+            <ImageView
+                style="@style/SettingsIconStyle"
+                android:src="@drawable/ic_backup_cloud" />
+
+            <TextView
+                style="@style/SettingsTextStyle"
+                android:fontFamily="@font/arimo_regular_font"
+                android:text="Backup Data" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="@drawable/foreground_ripple_effect"
+                android:visibility="invisible" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/setting_restore_data"
+            style="@style/SettingsRowStyle"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="@drawable/foreground_ripple_effect">
+
+            <ImageView
+                style="@style/SettingsIconStyle"
+                android:src="@drawable/ic_restore_cloud" />
+
+            <TextView
+                style="@style/SettingsTextStyle"
+                android:fontFamily="@font/arimo_regular_font"
+
+                android:text="Reset &amp; Restart" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="@drawable/foreground_ripple_effect"
+                android:visibility="invisible" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

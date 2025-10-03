@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_activity_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:cardBackgroundColor="@android:color/transparent"
+    app:cardPreventCornerOverlap="false"
+    app:cardUseCompatPadding="false"
+    tools:context=".ui.activity.LauncherActivity">
+
+    <ImageView
+        android:id="@+id/imgWall"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop" />
+
+    <LinearLayout
+        android:id="@+id/main_content_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:elevation="@dimen/_10sdp">
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/view_pager"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="0dp" />
+
+            <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
+                android:id="@+id/dots_indicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginVertical="@dimen/_5sdp"
+                android:elevation="@dimen/_1sdp"
+                app:dotsColor="@android:color/darker_gray"
+                app:dotsCornerRadius="@dimen/_5sdp"
+                app:dotsSize="@dimen/_5sdp"
+                app:dotsSpacing="@dimen/_4sdp"
+                app:dotsWidthFactor="2.5"
+                app:progressMode="true"
+                app:selectedDotColor="#FFFFFF" />
+
+            <FrameLayout
+                android:id="@+id/fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/lnrTaskBar"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_35sdp"
+            android:background="@color/white"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/_35sdp"
+                android:layout_alignParentStart="true"
+                android:layout_toLeftOf="@+id/lleanerss"
+
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/btnHome"
+                    android:layout_width="@dimen/_36sdp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+
+                    android:adjustViewBounds="true"
+                    android:padding="@dimen/_4sdp"
+
+
+                    android:src="@drawable/ic_home" />
+
+                <View
+                    android:layout_width="@dimen/_1sdp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_marginVertical="@dimen/_2sdp"
+                    android:adjustViewBounds="true"
+                    android:background="@color/light_gray"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="@drawable/foreground_ripple_effect"
+                    android:scaleType="fitXY" />
+
+
+                <ImageView
+                    android:id="@+id/btnSearch"
+                    android:layout_width="@dimen/_24sdp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_marginHorizontal="@dimen/_4sdp"
+                    android:layout_marginVertical="@dimen/_4sdp"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/ic_searchs" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/taskbar_recycler_view"
+
+                    android:layout_width="0dp"
+                    android:layout_height="@dimen/_35sdp"
+                    android:layout_gravity="center"
+                    android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="@drawable/foreground_ripple_effect"
+                    android:orientation="horizontal"
+                    android:visibility="visible"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    tools:listitem="@layout/taskbar_icon_item" />
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/lleanerss"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:layout_gravity="center_vertical|end"
+                android:gravity="center_vertical|end"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/btnContact"
+                    android:layout_width="@dimen/_20sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginHorizontal="@dimen/_4sdp"
+                    android:layout_marginVertical="@dimen/_4sdp"
+                    android:adjustViewBounds="true"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="@drawable/foreground_ripple_effect"
+                    android:src="@drawable/ic_contact_list" />
+
+                <ImageView
+                    android:id="@+id/btnRecent"
+                    android:layout_width="@dimen/_24sdp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_4sdp"
+                    android:adjustViewBounds="true"
+                    android:paddingHorizontal="@dimen/_3sdp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="@drawable/foreground_ripple_effect"
+                    android:src="@drawable/ic_arrow_up" />
+
+
+                <LinearLayout
+                    android:id="@+id/lnrDateTime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+
+                    android:layout_marginHorizontal="@dimen/_6sdp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginVertical="@dimen/_3sdp"
+                    android:foreground="@drawable/foreground_ripple_effect"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/txtTime"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:fontFamily="@font/arimo_regular_font"
+                        android:gravity="center"
+                        android:text="02:07 pm"
+                        android:textColor="@color/black"
+
+                        android:textSize="@dimen/_10ssp" />
+
+                    <TextView
+                        android:id="@+id/txtdate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:fontFamily="@font/arimo_regular_font"
+                        android:gravity="center"
+                        android:text="14/07/2025"
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/_10ssp" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/btnSetting"
+                    android:layout_width="@dimen/_20sdp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center|end"
+                    android:layout_marginStart="@dimen/_6sdp"
+                    android:layout_marginEnd="@dimen/_10sdp"
+                    android:adjustViewBounds="true"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="@drawable/foreground_ripple_effect"
+
+                    android:src="@drawable/home_msg_setting" />
+            </LinearLayout>
+
+        </RelativeLayout>
+    </LinearLayout>
+    <!-- Overlay for dragging items across pages -->
+    <FrameLayout
+        android:id="@+id/drag_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:clickable="true"
+        android:elevation="100dp"
+        android:focusable="true"
+        android:visibility="gone" />
+
+</androidx.cardview.widget.CardView>

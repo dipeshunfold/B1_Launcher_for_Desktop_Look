@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/tv_header"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:elevation="@dimen/_1sdp"
+    android:fontFamily="@font/roboto_medium"
+    android:padding="@dimen/_5sdp"
+
+
+    android:text="A"
+    android:textColor="@color/black"
+    android:textSize="@dimen/_12ssp" />

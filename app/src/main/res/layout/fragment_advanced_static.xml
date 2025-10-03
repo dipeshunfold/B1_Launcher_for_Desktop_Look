@@ -1,0 +1,203 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/_10sdp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:fontFamily="@font/arimo_bold_font"
+
+
+            android:text="Advance Features"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/_15ssp" />
+
+        <LinearLayout
+            android:id="@+id/setting_gestures"
+            style="@style/SettingsRowStyle"
+            android:visibility="gone">
+
+            <ImageView
+                style="@style/SettingsIconStyle"
+                android:src="@drawable/ic_gestures" />
+
+            <TextView
+                style="@style/SettingsTextStyle"
+                android:text="Gestures" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/setting_icon_tint_layout"
+            style="@style/SettingsRowStyle"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/icon_icon_tint"
+                style="@style/SettingsIconStyle"
+                android:src="@drawable/ic_tint" />
+
+            <TextView
+                style="@style/SettingsTextStyle"
+                android:layout_toEndOf="@id/icon_icon_tint"
+                android:text="Apply Icon Tint" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/setting_icon_tint_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                app:thumbTint="@color/switch_thumb_selector"
+                app:trackTint="@color/switch_track_selector" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/setting_cortana_layout"
+            style="@style/SettingsRowStyle"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/icon_cortana"
+                style="@style/SettingsIconStyle"
+                android:src="@drawable/icon_cortana" />
+
+            <TextView
+                android:id="@+id/icon_cortana_txt"
+
+                style="@style/SettingsTextStyle"
+                android:layout_toEndOf="@id/icon_cortana"
+                android:layout_weight="1"
+                android:fontFamily="@font/arimo_regular_font"
+
+                android:text="Enable Cortana" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/setting_cortana_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+
+                android:layout_centerVertical="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="@drawable/foreground_ripple_effect"
+                app:thumbTint="@color/switch_thumb_selector"
+                app:trackTint="@color/switch_track_selector" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/setting_transparent_taskbar_layout"
+            style="@style/SettingsRowStyle"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/icon_transparent_taskbar"
+                style="@style/SettingsIconStyle"
+                android:src="@drawable/ic_transparent" />
+
+            <TextView
+                style="@style/SettingsTextStyle"
+                android:layout_toEndOf="@id/icon_transparent_taskbar"
+                android:layout_weight="1"
+
+                android:fontFamily="@font/arimo_regular_font"
+                android:text="Transparent Taskbar" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/setting_transparent_taskbar_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/icon_transparent_taskbar"
+                android:layout_alignParentEnd="false"
+                android:layout_alignParentRight="true"
+
+                android:layout_centerVertical="true"
+
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="@drawable/foreground_ripple_effect"
+                app:thumbTint="@color/switch_thumb_selector"
+                app:trackTint="@color/switch_track_selector" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/setting_show_contacts_layout"
+            style="@style/SettingsRowStyle"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/icon_show_contacts"
+                style="@style/SettingsIconStyle"
+                android:src="@drawable/ic_contacts" />
+
+            <TextView
+                style="@style/SettingsTextStyle"
+                android:layout_toEndOf="@id/icon_show_contacts"
+                android:fontFamily="@font/arimo_regular_font"
+                android:layout_weight="1"
+
+                android:text="Show Contacts Icon" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/setting_show_contacts_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/icon_show_contacts"
+                android:layout_alignParentEnd="false"
+                android:layout_alignParentRight="true"
+
+                android:layout_centerVertical="true"
+                android:clickable="true"
+
+                android:focusable="true"
+                android:foreground="@drawable/foreground_ripple_effect"
+                app:thumbTint="@color/switch_thumb_selector"
+                app:trackTint="@color/switch_track_selector" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/setting_show_time_layout"
+            style="@style/SettingsRowStyle"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/icon_show_time"
+                style="@style/SettingsIconStyle"
+                android:src="@drawable/ic_time" />
+
+            <TextView
+                style="@style/SettingsTextStyle"
+                android:layout_toEndOf="@id/icon_show_time"
+                android:fontFamily="@font/arimo_regular_font"
+                android:layout_weight="1"
+
+                android:text="Show Taskbar Time" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/setting_show_time_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/icon_show_time"
+                android:layout_alignParentEnd="false"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+
+
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="@drawable/foreground_ripple_effect"
+                app:thumbTint="@color/switch_thumb_selector"
+                app:trackTint="@color/switch_track_selector" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

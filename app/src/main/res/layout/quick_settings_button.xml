@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:background="@drawable/quick_settings_button_background"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="@drawable/foreground_ripple_effect"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="@dimen/_10sdp"
+    tools:parentTag="LinearLayout">
+
+    <ImageView
+        android:id="@+id/icon"
+        android:layout_width="@dimen/_15sdp"
+        android:layout_height="@dimen/_15sdp"
+        android:layout_gravity="center"
+        android:adjustViewBounds="true"
+        tools:src="@drawable/ic_wifi"
+        tools:tint="@color/quick_settings_icon_tint" />
+
+    <TextView
+        android:id="@+id/label"
+        style="@style/DayOfWeek"
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/_5sdp"
+
+
+        android:textColor="@color/quick_settings_icon_tint"
+        android:textSize="@dimen/_9ssp"
+        tools:text="WiFi" />
+
+</LinearLayout>

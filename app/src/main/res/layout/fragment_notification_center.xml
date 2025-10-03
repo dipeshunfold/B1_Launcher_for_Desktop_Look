@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#00000000"
+    android:clickable="true"
+    android:focusable="true"
+    tools:context=".customlauncher.ui.fragment.NotificationFragment">
+
+
+    <LinearLayout
+        android:layout_width="@dimen/_250sdp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center|bottom|end"
+        android:layout_marginTop="@dimen/_30sdp"
+        android:layout_marginEnd="@dimen/_10sdp"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="bottom"
+        android:orientation="vertical">
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/content_container"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_150sdp"
+            android:background="@drawable/notification_item_background"
+            android:clickable="true"
+            android:elevation="@dimen/_2sdp"
+            android:focusable="true"
+            android:orientation="vertical"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="@dimen/_10sdp"
+            app:cardElevation="0dp"
+            app:cardPreventCornerOverlap="false">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/blur_background"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_150sdp"
+                android:scaleType="centerCrop"
+                android:visibility="invisible"
+                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.Rounded" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/glass_edge_background">
+
+                <LinearLayout
+                    android:id="@+id/notification_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+
+                    android:padding="@dimen/_10sdp">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            style="@style/DayOfWeek"
+                            android:layout_width="wrap_content"
+
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentStart="true"
+                            android:layout_centerVertical="true"
+                            android:fontFamily="@font/arimo_regular_font"
+                            android:text="Notification"
+                            android:textColor="@color/black"
+
+                            android:textSize="@dimen/_12ssp" />
+
+                        <TextView
+                            android:id="@+id/btn_clear_all"
+                            style="@style/DayOfWeek"
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentEnd="true"
+                            android:layout_centerVertical="true"
+                            android:background="?attr/selectableItemBackground"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="@drawable/foreground_ripple_effect"
+                            android:paddingHorizontal="@dimen/_10sdp"
+                            android:paddingVertical="@dimen/_5sdp"
+                            android:text="Clear All"
+                            android:textColor="@color/black"
+
+                            android:textSize="@dimen/_10ssp" />
+                    </RelativeLayout>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginTop="@dimen/_5sdp">
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/notifications_recycler_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent" />
+
+                        <TextView
+                            android:id="@+id/tv_no_notifications"
+                            style="@style/DayOfWeek"
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:text="No notifications"
+                            android:textColor="@color/black"
+                            android:textSize="@dimen/_10ssp"
+                            android:visibility="gone"
+
+                            tools:visibility="visible" />
+                    </FrameLayout>
+
+                </LinearLayout>
+
+
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/content_container1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:background="@drawable/notification_item_background"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="vertical"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="@dimen/_10sdp"
+            app:cardElevation="0dp"
+            app:cardPreventCornerOverlap="false">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/blur_background1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:visibility="invisible"
+                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.Rounded" />
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/glass_edge_background">
+
+                <LinearLayout
+                    android:id="@+id/quick_settings_panel1"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+
+                    android:padding="@dimen/_5sdp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal"
+                        android:padding="@dimen/_5sdp">
+
+                        <TextView
+                            style="@style/DayOfWeek"
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:gravity="start"
+                            android:text="Enable Notification"
+                            android:textColor="@color/black"
+
+
+                            android:textSize="@dimen/_12ssp" />
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/toggle_notification"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:foreground="@drawable/foreground_ripple_effect"
+                            app:thumbTint="@color/switch_thumb_selector"
+                            app:trackTint="@color/switch_track_selector" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginVertical="@dimen/_5sdp"
+                        android:background="#DADCE0" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="@dimen/_5sdp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal">
+
+                            <include
+                                android:id="@+id/btn_airplane"
+                                layout="@layout/quick_settings_button" />
+
+                            <Space
+                                android:layout_width="@dimen/_10sdp"
+                                android:layout_height="match_parent" />
+
+                            <include
+                                android:id="@+id/btn_wifi"
+                                layout="@layout/quick_settings_button" />
+
+                            <Space
+                                android:layout_width="@dimen/_10sdp"
+                                android:layout_height="match_parent" />
+
+                            <include
+                                android:id="@+id/btn_bluetooth"
+                                layout="@layout/quick_settings_button" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/_5sdp"
+                            android:orientation="horizontal">
+
+                            <include
+                                android:id="@+id/btn_flashlight"
+                                layout="@layout/quick_settings_button" />
+
+                            <Space
+                                android:layout_width="@dimen/_10sdp"
+                                android:layout_height="match_parent" />
+
+                            <include
+                                android:id="@+id/btn_auto_brightness"
+                                layout="@layout/quick_settings_button" />
+
+                            <Space
+                                android:layout_width="@dimen/_10sdp"
+                                android:layout_height="match_parent" />
+
+                            <include
+                                android:id="@+id/btn_data"
+                                layout="@layout/quick_settings_button" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/_5sdp"
+                            android:orientation="horizontal">
+
+                            <include
+                                android:id="@+id/btn_rotate"
+                                layout="@layout/quick_settings_button" />
+
+                            <Space
+                                android:layout_width="@dimen/_10sdp"
+                                android:layout_height="match_parent" />
+
+                            <include
+                                android:id="@+id/btn_hotspot"
+                                layout="@layout/quick_settings_button" />
+
+                            <Space
+                                android:layout_width="@dimen/_10sdp"
+                                android:layout_height="match_parent" />
+
+                            <include
+                                android:id="@+id/btn_location"
+                                layout="@layout/quick_settings_button" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/_5sdp"
+                            android:orientation="horizontal">
+
+                            <include
+                                android:id="@+id/btn_settings"
+                                layout="@layout/quick_settings_button" />
+
+                            <Space
+                                android:layout_width="@dimen/_10sdp"
+                                android:layout_height="match_parent" />
+
+                            <include
+                                android:id="@+id/btn_sound"
+                                layout="@layout/quick_settings_button" />
+
+                            <Space
+                                android:layout_width="@dimen/_10sdp"
+                                android:layout_height="match_parent" />
+
+                            <include
+                                android:id="@+id/btn_wallpapers"
+                                layout="@layout/quick_settings_button" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/_10sdp">
+
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/_5sdp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="@dimen/_20sdp"
+                                android:layout_height="@dimen/_20sdp"
+                                android:src="@drawable/ic_brightness" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+
+                                <SeekBar
+                                    android:id="@+id/seekbar_brightness"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="@dimen/_5sdp"
+                                    android:layout_weight="1"
+                                    android:max="255"
+
+                                    android:maxHeight="5dp"
+                                    android:minHeight="5dp"
+
+                                    android:paddingStart="@dimen/_10sdp"
+                                    android:paddingEnd="@dimen/_10sdp"
+
+                                    android:progressDrawable="@drawable/custom_volume_track"
+                                    android:splitTrack="false"
+
+                                    android:thumb="@drawable/custom_volume_thumb"
+                                    android:thumbTint="@null" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/_10sdp"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:layout_width="@dimen/_20sdp"
+                                android:layout_height="@dimen/_20sdp"
+                                android:padding="@dimen/_2sdp"
+                                android:src="@drawable/ic_volume" />
+
+
+                            <SeekBar
+                                android:id="@+id/seekbar_volume"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/_5sdp"
+                                android:layout_weight="1"
+
+                                android:max="255"
+                                android:maxHeight="5dp"
+                                android:minHeight="5dp"
+                                android:paddingStart="@dimen/_10sdp"
+                                android:paddingEnd="@dimen/_10sdp"
+
+                                android:progressDrawable="@drawable/custom_volume_track"
+                                android:splitTrack="false"
+
+                                android:thumb="@drawable/custom_volume_thumb"
+                                android:thumbTint="@null" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </LinearLayout>
+
+            </RelativeLayout>
+        </androidx.cardview.widget.CardView>
+
+
+    </LinearLayout>
+
+</FrameLayout>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/_120sdp"
+    android:layout_marginVertical="@dimen/_10sdp"
+    android:background="@drawable/bg_fragment_launcher"
+    android:elevation="@dimen/_1sdp"
+    android:orientation="vertical"
+    android:padding="@dimen/_10sdp">
+
+    <TextView
+        android:id="@+id/rename_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:fontFamily="@font/font_semibold"
+
+
+        android:text="Rename File"
+        android:textAppearance="?attr/textAppearanceHeadline6"
+        android:textColor="@color/colorPrimary"
+        android:textSize="@dimen/_15ssp" />
+
+    <EditText
+        android:id="@+id/rename_input"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_margin="@dimen/_10sdp"
+        android:background="@drawable/bg_fragment_launcher"
+        android:backgroundTint="@color/light_gray"
+        android:fontFamily="@font/arimo_regular_font"
+        android:hint="New file name"
+        android:inputType="text"
+        android:padding="@dimen/_5sdp"
+        android:textColor="@color/black"
+        android:textSize="@dimen/_12ssp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_5sdp"
+            android:background="@drawable/bg_fragment_launcher"
+            android:backgroundTint="@color/colorPrimary"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/arimo_regular_font"
+            android:foreground="@drawable/foreground_ripple_effect"
+            android:text="Cancel"
+            android:textAllCaps="false"
+            android:textColor="@color/white" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_ok"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/_5sdp"
+            android:background="@drawable/bg_fragment_launcher"
+            android:backgroundTint="@color/white"
+            android:clickable="true"
+            android:focusable="true"
+            android:fontFamily="@font/arimo_regular_font"
+            android:foreground="@drawable/foreground_ripple_effect"
+            android:text="Okay"
+            android:textAllCaps="false"
+            android:textColor="@color/folder_text_color" />
+
+    </LinearLayout>
+</LinearLayout>

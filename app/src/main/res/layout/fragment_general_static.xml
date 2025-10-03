@@ -1,0 +1,93 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/_10sdp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:fontFamily="@font/arimo_bold_font"
+
+
+            android:text="General"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/_15ssp" />
+
+        <LinearLayout
+            android:id="@+id/setting_text_color"
+            style="@style/SettingsRowStyle"
+            android:visibility="gone">
+
+            <ImageView
+                style="@style/SettingsIconStyle"
+                android:src="@drawable/ic_text_color" />
+
+            <TextView
+                style="@style/SettingsTextStyle"
+
+                android:text="Desktop Item Text Color" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/setting_date_format"
+            style="@style/SettingsRowStyle"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="@drawable/foreground_ripple_effect">
+
+            <ImageView
+                style="@style/SettingsIconStyle"
+                android:src="@drawable/ic_date" />
+
+            <TextView
+                style="@style/SettingsTextStyle"
+                android:text="Date Format" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="@drawable/foreground_ripple_effect"
+                android:visibility="invisible" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/setting_device_name"
+            style="@style/SettingsRowStyle"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="@drawable/foreground_ripple_effect">
+
+            <ImageView
+                style="@style/SettingsIconStyle"
+                android:src="@drawable/ic_device" />
+
+            <TextView
+                style="@style/SettingsTextStyle"
+                android:text="Device Name" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="@drawable/foreground_ripple_effect"
+                android:visibility="invisible" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

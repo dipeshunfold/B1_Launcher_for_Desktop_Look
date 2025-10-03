@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#00000000"
+    android:clickable="true"
+    android:focusable="true"
+    tools:context="ui.fragment.AppListFragment">
+
+    <LinearLayout
+        android:id="@+id/content_container"
+
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/_400sdp"
+        android:layout_gravity="center"
+        android:layout_margin="@dimen/_10sdp"
+        android:background="@drawable/bg_fragment_launcher"
+        android:elevation="@dimen/_1sdp"
+
+        android:orientation="vertical"
+        android:padding="@dimen/_10sdp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_10sdp">
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/set_default_button"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/_30sdp"
+                android:layout_centerVertical="true"
+                android:layout_margin="@dimen/_2sdp"
+                android:background="@drawable/bg_fragment_launcher"
+                android:backgroundTint="#F6F6F6"
+                android:clickable="true"
+                android:focusable="true"
+                android:fontFamily="@font/arimo_regular_font"
+                android:foreground="@drawable/foreground_ripple_effect"
+                android:paddingHorizontal="@dimen/_10sdp"
+                android:text="Set Default"
+                android:textAllCaps="false"
+                android:textColor="@color/black" />
+
+            <ImageView
+                android:id="@+id/back_button"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="@drawable/foreground_ripple_effect"
+                android:padding="@dimen/_5sdp"
+                android:src="@drawable/ic_close_filesss"
+                android:tint="#989797" />
+
+
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:fontFamily="@font/font_semibold"
+
+
+            android:text="Choose Text Color"
+
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/_12ssp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/text_color_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_10sdp"
+            android:orientation="horizontal" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:fontFamily="@font/font_semibold"
+
+
+            android:text="Choose Background Color"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/_12ssp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/background_color_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+</FrameLayout>

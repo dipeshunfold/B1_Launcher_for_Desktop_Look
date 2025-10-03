@@ -1,0 +1,138 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/_10sdp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:fontFamily="@font/arimo_bold_font"
+
+
+            android:text="Personalization"
+            android:textColor="@color/colorPrimary"
+            android:textSize="@dimen/_15ssp" />
+
+
+        <LinearLayout
+            android:id="@+id/setting_wallpapers"
+            style="@style/SettingsRowStyle"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="horizontal"
+            android:foreground="@drawable/foreground_ripple_effect">
+
+            <ImageView
+                style="@style/SettingsIconStyle"
+                android:src="@drawable/ic_wallpaper" />
+
+            <TextView
+                style="@style/SettingsTextStyle"
+                android:text="Wallpapers" />
+            <androidx.appcompat.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="invisible"
+                android:foreground="@drawable/foreground_ripple_effect" />
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/setting_taskbar_color"
+            style="@style/SettingsRowStyle"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="@drawable/foreground_ripple_effect">
+
+            <ImageView
+                style="@style/SettingsIconStyle"
+                android:src="@drawable/ic_taskbar_color" />
+
+            <TextView
+                style="@style/SettingsTextStyle"
+                android:text="Taskbar Color" />
+            <androidx.appcompat.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="invisible"
+                android:foreground="@drawable/foreground_ripple_effect" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/setting_grid_size"
+            style="@style/SettingsRowStyle"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="@drawable/foreground_ripple_effect">
+
+            <ImageView
+                style="@style/SettingsIconStyle"
+                android:src="@drawable/ic_grid_size" />
+
+            <TextView
+                style="@style/SettingsTextStyle"
+                android:text="Desktop Grid Size" />
+            <androidx.appcompat.widget.SwitchCompat
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:visibility="invisible"
+                android:foreground="@drawable/foreground_ripple_effect" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/setting_hide_icons_layout"
+            style="@style/SettingsRowStyle"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="@drawable/foreground_ripple_effect"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/icon_hide_icons"
+                style="@style/SettingsIconStyle"
+                android:src="@drawable/ic_hide_icons" />
+
+
+            <TextView
+                style="@style/SettingsTextStyle"
+                android:layout_toEndOf="@id/icon_hide_icons"
+                android:layout_weight="1"
+                android:text="Hide Taskbar Icons" />
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:id="@+id/setting_hide_icons_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="@drawable/foreground_ripple_effect" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

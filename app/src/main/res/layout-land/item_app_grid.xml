@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/_5sdp"
+    android:background="@drawable/bg_fragment_launcher"
+    android:backgroundTint="#EDEDED"
+    android:clickable="true"
+    android:elevation="@dimen/_1sdp"
+    android:focusable="true"
+    android:foreground="@drawable/foreground_ripple_effect"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="@dimen/_3sdp">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/preview_card"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_1sdp"
+
+        app:cardCornerRadius="@dimen/_10sdp"
+        app:cardElevation="@dimen/_1sdp">
+
+
+        <ImageView
+            android:id="@+id/iv_app_icon_grid"
+            android:layout_width="@dimen/_30sdp"
+            android:layout_height="@dimen/_30sdp"
+            android:layout_gravity="center"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/ic_launcher" />
+
+    </androidx.cardview.widget.CardView>
+
+
+    <com.bluelight.computer.winlauncher.prolauncher.model.AlwaysMarqueeTextView
+        android:id="@+id/tv_app_name_grid"
+        android:layout_width="@dimen/_50sdp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginVertical="@dimen/_2sdp"
+        android:elevation="@dimen/_1sdp"
+        android:ellipsize="marquee"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:fontFamily="@font/arimo_regular_font"
+        android:gravity="center"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:maxLines="1"
+        android:scrollHorizontally="true"
+
+
+        android:text="Very Long App Name That Will Marquee"
+        android:textColor="@color/black"
+        android:textSize="@dimen/_10ssp" />
+
+
+</LinearLayout>

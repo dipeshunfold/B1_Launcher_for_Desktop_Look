@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#00000000"
+    android:clickable="true"
+    android:focusable="true"
+    tools:context=".ui.fragment.CalendarFragment">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/blur_background"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom|end"
+        android:layout_marginStart="@dimen/_50sdp"
+        android:layout_marginEnd="@dimen/_10sdp"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:scaleType="centerCrop"
+        android:visibility="invisible"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.Rounded" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/content_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom|end"
+        android:layout_marginStart="@dimen/_50sdp"
+        android:layout_marginEnd="@dimen/_10sdp"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:clickable="true"
+        android:elevation="@dimen/_2sdp"
+        android:focusable="true"
+        app:cardBackgroundColor="@android:color/transparent"
+        app:cardCornerRadius="@dimen/_10sdp"
+        app:cardElevation="0dp"
+        app:cardPreventCornerOverlap="false">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/glass_edge_background">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center|bottom|end"
+
+                android:backgroundTint="@color/white"
+                android:clickable="true"
+                android:focusable="true"
+                android:orientation="vertical"
+                android:padding="@dimen/_5sdp">
+
+
+                <TextView
+                    android:id="@+id/tv_clock"
+                    style="@style/DayOfWeek"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/arimo_regular_font"
+                    android:gravity="center"
+                    android:paddingHorizontal="@dimen/_20sdp"
+
+
+                    android:textColor="#000000"
+                    android:textSize="@dimen/_30ssp"
+
+                    tools:text="02:11:37 pm" />
+
+                <TextView
+                    android:id="@+id/tv_full_date"
+                    style="@style/DayOfWeek"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:layout_marginBottom="@dimen/_15sdp"
+                    android:gravity="center"
+                    android:textSize="@dimen/_12ssp"
+                    tools:text="Monday, 14 July 2025" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/_1sdp"
+                    android:background="@color/colorPrimary" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/btn_prev_month"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Previous Month"
+                        android:src="@drawable/ic_chevron_left"
+                        android:tint="@color/colorPrimary" />
+
+                    <TextView
+                        android:id="@+id/tv_month_year"
+                        style="@style/DayOfWeek"
+
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:fontFamily="@font/roboto_medium"
+                        android:gravity="center"
+
+
+                        android:textColor="@android:color/black"
+                        android:textSize="@dimen/_16ssp"
+
+                        tools:text="July 2025" />
+
+                    <ImageButton
+                        android:id="@+id/btn_next_month"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="Next Month"
+                        android:src="@drawable/ic_chevron_right"
+                        android:tint="@color/colorPrimary" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        style="@style/DayOfWeek"
+
+
+                        android:layout_height="match_parent"
+                        android:text="Mon" />
+
+                    <TextView
+                        style="@style/DayOfWeek"
+
+
+                        android:text="Tue" />
+
+                    <TextView
+                        style="@style/DayOfWeek"
+
+
+                        android:text="Wed" />
+
+                    <TextView
+                        style="@style/DayOfWeek"
+
+
+                        android:text="Thu" />
+
+                    <TextView
+                        style="@style/DayOfWeek"
+
+
+                        android:text="Fri" />
+
+                    <TextView
+                        style="@style/DayOfWeek"
+
+
+                        android:text="Sat" />
+
+                    <TextView
+                        style="@style/DayOfWeek"
+
+
+                        android:text="Sun" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/calendar_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_5sdp" />
+
+            </LinearLayout>
+
+        </RelativeLayout>
+    </androidx.cardview.widget.CardView>
+
+</FrameLayout>
