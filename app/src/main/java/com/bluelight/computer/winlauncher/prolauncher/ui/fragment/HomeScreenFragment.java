@@ -997,7 +997,7 @@ public class HomeScreenFragment extends Fragment {
     private int typePriority(AppItem item) {
         // Lower number means higher priority
         switch (item.getType()) {
-            case SETTING:
+            case SETTINGS:
             case WALLPAPER_ACTION:
             case FILE_MANAGER_ACTION:
             case USER:
@@ -1082,7 +1082,7 @@ public class HomeScreenFragment extends Fragment {
                 case GOOGLE_FOLDER:
                     appIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_folder_social);
                     break;
-                case SETTING:
+                case SETTINGS:
                     appIcon = ContextCompat.getDrawable(requireContext(), R.drawable.img_system_setting);
                     break;
                 case APP:
@@ -1460,7 +1460,7 @@ public class HomeScreenFragment extends Fragment {
             case SOCIAL_MEDIA_FOLDER:
                 showAppsDialog(getAppsForPackages(SOCIAL_MEDIA_PACKAGES), "Social Media");
                 return;
-            case SETTING:
+            case SETTINGS:
                 Intent intent1 = new Intent(android.provider.Settings.ACTION_SETTINGS);
                 intent1.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent1);

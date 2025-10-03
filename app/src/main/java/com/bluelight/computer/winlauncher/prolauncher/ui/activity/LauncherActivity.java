@@ -1130,7 +1130,7 @@ public class LauncherActivity extends AppCompatActivity implements HomeScreenFra
             defaultItemsToInsert.add(createSpecialItem("User", AppItem.Type.USER, 2, 0));
             defaultItemsToInsert.add(createSpecialItem("This PC", AppItem.Type.FILE_MANAGER_ACTION, 3, 0));
             defaultItemsToInsert.add(createSpecialItem("Wallpapers", AppItem.Type.WALLPAPER_ACTION, 4, 0));
-            defaultItemsToInsert.add(createSpecialItem("Setting", AppItem.Type.SETTING, 5, 0));
+            defaultItemsToInsert.add(createSpecialItem("Settings", AppItem.Type.SETTINGS, 5, 0));
 
             PackageManager pm = getPackageManager();
             List<ResolveInfo> allInstalledApps = pm.queryIntentActivities(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER), 0);

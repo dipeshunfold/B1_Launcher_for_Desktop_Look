@@ -156,7 +156,7 @@ public class AppItem {
         APP,
         WIDGET,
         WALLPAPER_ACTION,
-        SETTING,
+        SETTINGS,
         FILE_MANAGER_ACTION,
         SOCIAL_MEDIA_FOLDER,
         USER,
