@@ -18,8 +18,8 @@
             android:id="@+id/img_thumbnail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/wallpaper_0" />
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop" />
 
         <View
             android:id="@+id/selection_border"

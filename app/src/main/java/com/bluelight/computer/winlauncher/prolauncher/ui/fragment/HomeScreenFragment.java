@@ -35,7 +35,6 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LruCache;
-import android.util.Pair;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -65,6 +64,7 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
 import com.bluelight.computer.winlauncher.prolauncher.R;
 import com.bluelight.computer.winlauncher.prolauncher.database.AppDatabase;
@@ -93,6 +93,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class HomeScreenFragment extends Fragment {
+
+
     public static final String KEY_PROFILE_SETUP_COMPLETE = "key_profile_setup_complete";
     public static final String KEY_PROFILE_NAME = "key_profile_name";
     public static final String KEY_PROFILE_IMAGE_PATH = "key_profile_image_path";
@@ -315,6 +317,8 @@ public class HomeScreenFragment extends Fragment {
         appItemDao = db.appItemDao();
         databaseWriteExecutor = Executors.newSingleThreadExecutor();
         appWidgetManager = AppWidgetManager.getInstance(requireContext());
+        appWidgetHost = new AppWidgetHost(requireContext(), 1); // Use your host ID
+
         appWidgetHost = listener.getAppWidgetHost();
         viewModel = new ViewModelProvider(this).get(AppItemViewModel.class);
         setupIconSizeChangeReceiver();
@@ -570,38 +574,51 @@ public class HomeScreenFragment extends Fragment {
     @Override
     public void onConfigurationChanged(@NonNull android.content.res.Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        // Handle orientation changes
+
+        // Save current page and scroll position
+        int currentPage = pageIndex;
+        ViewPager viewPager = getActivity() != null ? getActivity().findViewById(R.id.viewPager) : null;
+
+        // Initialize grid size on the main thread
         initializeGridSize();
 
         // Handle widget updates on a background thread
         databaseWriteExecutor.execute(() -> {
             try {
-                // Get widgets on background thread
-                List<AppItem> widgets = appItemDao.getWidgetsSync();
+                // Get all widgets
+                List<AppItem> allWidgets = appItemDao.getWidgetsSync();
 
-                // Store widget sizes
-                final Map<Integer, Pair<Integer, Integer>> widgetSizes = new HashMap<>();
-                for (AppItem widget : widgets) {
+                // Store widget states
+                for (AppItem widget : allWidgets) {
                     if (widget.getType() == AppItem.Type.WIDGET) {
-                        widgetSizes.put(widget.id, new Pair<>(widget.getOriginalWidth(), widget.getOriginalHeight()));
+                        // Store original dimensions if not set
+                        if (widget.getOriginalWidth() <= 0 || widget.getOriginalHeight() <= 0) {
+                            widget.setOriginalDimensions(widget.getColSpan(), widget.getRowSpan());
+                            appItemDao.update(widget);
+                        }
                     }
                 }
 
                 // Update UI on main thread
-                if (rootLayout != null) {
-                    homeScreenHandler.post(() -> {
-                        if (!isAdded()) return;
+                homeScreenHandler.post(() -> {
+                    if (!isAdded() || getActivity() == null) return;
 
-                        // Update all widgets to ensure proper sizing
-                        updateWidgetsOnUiThread();
+                    // Restore the original page
+                    if (viewPager != null && currentPage < viewPager.getAdapter().getCount()) {
+                        viewPager.setCurrentItem(currentPage, false);
+                    }
 
-                        int orientation = getResources().getConfiguration().orientation;
-                        if (orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT) {
-                            // When coming back to portrait, fill each page up to portrait capacity
-                            rebalancePagesForPortrait();
-                        }
-                    });
-                }
+                    // Update all widgets to ensure proper sizing
+                    updateWidgetsOnUiThread();
+
+                    // Force a layout update
+                    if (rootLayout != null) {
+                        rootLayout.post(() -> {
+                            rootLayout.requestLayout();
+                            rootLayout.invalidate();
+                        });
+                    }
+                });
             } catch (Exception e) {
                 Log.e(TAG, "Error in onConfigurationChanged", e);
             }
@@ -609,25 +626,61 @@ public class HomeScreenFragment extends Fragment {
     }
 
     private void updateWidgetsOnUiThread() {
-        if (!isAdded() || appItemDao == null) return;
+        if (!isAdded() || appItemDao == null || rootLayout == null) return;
 
-        // Get widgets on a background thread
         databaseWriteExecutor.execute(() -> {
             try {
                 List<AppItem> widgets = appItemDao.getWidgetsSync();
                 homeScreenHandler.post(() -> {
-                    if (!isAdded()) return;
-                    for (AppItem widget : widgets) {
-                        if (widget.getView() != null) {
-                            updateWidgetLayout(widget);
+                    if (!isAdded() || rootLayout == null) return;
+
+                    // Remove existing widget views
+                    List<View> viewsToRemove = new ArrayList<>();
+                    for (int i = 0; i < rootLayout.getChildCount(); i++) {
+                        View child = rootLayout.getChildAt(i);
+                        if (child.getTag() instanceof AppItem) {
+                            AppItem item = (AppItem) child.getTag();
+                            if (item.getType() == AppItem.Type.WIDGET) {
+                                viewsToRemove.add(child);
+                            }
                         }
                     }
+
+                    for (View view : viewsToRemove) {
+                        rootLayout.removeView(view);
+                    }
+
+                    // Add all widgets back with correct dimensions
+                    for (AppItem widget : widgets) {
+                        if (widget.getType() == AppItem.Type.WIDGET && widget.getPage() == pageIndex) {
+                            AppWidgetProviderInfo appWidgetInfo = appWidgetManager.getAppWidgetInfo(widget.getAppWidgetId());
+                            if (appWidgetInfo != null) {
+                                // Remove existing view if any
+                                if (widget.getView() != null) {
+                                    View oldView = widget.getView();
+                                    if (oldView.getParent() != null) {
+                                        ((ViewGroup) oldView.getParent()).removeView(oldView);
+                                    }
+                                }
+
+                                // Create new widget view
+                                addWidgetToGrid(appWidgetInfo, widget);
+                            }
+                        }
+                    }
+
+                    // Force layout update
+                    rootLayout.post(() -> {
+                        rootLayout.requestLayout();
+                        rootLayout.invalidate();
+                    });
                 });
             } catch (Exception e) {
                 Log.e(TAG, "Error updating widgets", e);
             }
         });
     }
+
     private void updateWidgetLayout(AppItem widget) {
         if (widget.getType() != AppItem.Type.WIDGET || widget.getView() == null) {
             return;
@@ -1049,20 +1102,20 @@ public class HomeScreenFragment extends Fragment {
         int iconSize;
         if (orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE) {
             // Landscape: maximize icon size while leaving adequate space for 2-line labels
-            int reservedLabelDp = 30; // Increased to prevent text cutoff with larger icons
+            int reservedLabelDp = 35; // Increased to prevent text cutoff with larger icons
             int reservedLabelPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, reservedLabelDp, getResources().getDisplayMetrics());
             int baseSize = Math.max(1, Math.min(cellWidth, Math.max(1, cellHeight - reservedLabelPx)));
 
             float factor;
             switch (currentSizePref) {
                 case PreferenceHelper.ICON_SIZE_SMALL:
-                    factor = 1.05f; // Increased significantly
+                    factor = 1.55f; // Increased significantly
                     break;
                 case PreferenceHelper.ICON_SIZE_LARGE:
-                    factor = 1.25f; // Much larger
+                    factor = 1.55f; // Much larger
                     break;
                 default:
-                    factor = 1.15f; // Noticeably larger
+                    factor = 1.55f; // Noticeably larger
                     break;
             }
             iconSize = Math.max(1, (int) (baseSize * factor));

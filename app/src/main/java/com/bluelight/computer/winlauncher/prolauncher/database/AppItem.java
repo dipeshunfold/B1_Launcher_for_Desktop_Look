@@ -105,7 +105,7 @@ public class AppItem {
     public int getColSpan() {
         return colSpan;
     }
-    
+
     public void setColSpan(int colSpan) {
         this.colSpan = colSpan;
     }
@@ -161,5 +161,9 @@ public class AppItem {
         SOCIAL_MEDIA_FOLDER,
         USER,
         GOOGLE_FOLDER
+    }
+
+    public int getPage() {
+        return Math.max(0, page); // Replace 'page' with your actual field name
     }
 }

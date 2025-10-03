@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.FrameLayout; // Import FrameLayout
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
@@ -35,14 +36,13 @@ import com.google.android.material.imageview.ShapeableImageView;
 
 public class LauncherMenuDialogFragment extends DialogFragment {
 
-    private static final String ARG_BOTTOM_OFFSET = "arg_bottom_offset"; // Re-introduce
-    private int bottomOffset = 0; // Re-introduce
+    private static final String ARG_BOTTOM_OFFSET = "arg_bottom_offset";
+    private int bottomOffset = 0;
 
-    // Modified newInstance to accept bottomOffset (which will be taskbarHeight)
-    public static LauncherMenuDialogFragment newInstance(int bottomOffset) { // MODIFIED
+    public static LauncherMenuDialogFragment newInstance(int bottomOffset) {
         LauncherMenuDialogFragment fragment = new LauncherMenuDialogFragment();
         Bundle args = new Bundle();
-        args.putInt(ARG_BOTTOM_OFFSET, bottomOffset); // Pass the offset
+        args.putInt(ARG_BOTTOM_OFFSET, bottomOffset);
         fragment.setArguments(args);
         return fragment;
     }
@@ -59,7 +59,7 @@ public class LauncherMenuDialogFragment extends DialogFragment {
         setStyle(DialogFragment.STYLE_NORMAL, R.style.LauncherMenuDialogTheme);
 
         if (getArguments() != null) {
-            bottomOffset = getArguments().getInt(ARG_BOTTOM_OFFSET, 0); // Retrieve the offset
+            bottomOffset = getArguments().getInt(ARG_BOTTOM_OFFSET, 0);
         }
     }
 
@@ -67,19 +67,28 @@ public class LauncherMenuDialogFragment extends DialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // IMPORTANT: Apply window insets to the dialog's root view
-        // This ensures the dialog's *content* accounts for the system navigation bar (if present)
         ViewCompat.setOnApplyWindowInsetsListener(view, (v, windowInsets) -> {
             Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
-            // Apply padding to the bottom of the dialog's content to account for the navigation bar
-            // and to the top for the status bar if it covers content
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return WindowInsetsCompat.CONSUMED; // Consume the insets
+            return WindowInsetsCompat.CONSUMED;
         });
 
         applyBlurToContentContainer(view);
 
+        // Find the root layout and set a click listener on it
+        FrameLayout rootLayout = view.findViewById(R.id.root_layout);
+        if (rootLayout != null) {
+            rootLayout.setOnClickListener(v -> {
+                // This listener will be triggered if a click occurs on the root_layout
+                // itself, but not on any of its children that consume the click (like menu items).
+                // This effectively dismisses the dialog when clicking on the transparent
+                // areas of the root_layout, outside the actual menu content.
+                dismiss();
+            });
+        }
+
         setupMenuItem(view.findViewById(R.id.menu_wallpapers), v -> {
+            // Assuming WallpaperActivity exists
             Intent intent = new Intent(getActivity(), WallpaperActivity.class);
             startActivity(intent);
             dismiss();
@@ -103,6 +112,7 @@ public class LauncherMenuDialogFragment extends DialogFragment {
             } else {
                 Log.e("LauncherMenu", "Activity is not LauncherActivity");
             }
+            dismiss(); // Added for consistency
         });
 
         setupMenuItem(view.findViewById(R.id.menu_remove_page), v -> {
@@ -118,6 +128,7 @@ public class LauncherMenuDialogFragment extends DialogFragment {
             dismiss();
         });
         setupMenuItem(view.findViewById(R.id.menu_settings), v -> {
+            // Assuming SettingsFragment exists
             ((LauncherActivity) requireActivity()).toggleFragment(SettingsFragment.class, R.anim.slide_up, R.anim.slide_down);
             dismiss();
         });
@@ -128,7 +139,6 @@ public class LauncherMenuDialogFragment extends DialogFragment {
         ShapeableImageView blurBackground = view.findViewById(R.id.blur_background);
 
         contentContainer.post(() -> {
-            // Check if fragment is still added and activity is not null
             if (!isAdded() || requireActivity().isFinishing()) {
                 return;
             }
@@ -152,12 +162,11 @@ public class LauncherMenuDialogFragment extends DialogFragment {
 
             if (width <= 0 || height <= 0) {
                 Log.e("BlurDebug", "Content container for blur has zero dimensions.");
-                fullBitmap.recycle(); // Important to recycle if not used
+                fullBitmap.recycle();
                 return;
             }
             Log.d("BlurDebug", "Position: x=" + x + ", y=" + y + ", width=" + width + ", height=" + height);
 
-            // Ensure the crop coordinates are within the bitmap bounds
             x = Math.max(0, x);
             y = Math.max(0, y);
             width = Math.min(width, fullBitmap.getWidth() - x);
@@ -170,30 +179,24 @@ public class LauncherMenuDialogFragment extends DialogFragment {
             }
 
             Bitmap croppedBitmap = Bitmap.createBitmap(fullBitmap, x, y, width, height);
-            fullBitmap.recycle(); // Recycle original full bitmap
+            fullBitmap.recycle();
 
             float scale = 0.5f;
             Bitmap scaledBitmap = Bitmap.createScaledBitmap(croppedBitmap,
                     (int) (croppedBitmap.getWidth() * scale),
                     (int) (croppedBitmap.getHeight() * scale),
                     true);
-            croppedBitmap.recycle(); // Recycle cropped bitmap
+            croppedBitmap.recycle();
 
             Bitmap blurredBitmap = blurBitmap(scaledBitmap, requireContext(), 15f);
             Bitmap finalBitmap = Bitmap.createScaledBitmap(blurredBitmap, width, height, true);
-            // scaledBitmap is already recycled if blurBitmap returns a new one,
-            // or is the same instance if blurBitmap modified it in place.
-            // blurredBitmap might be the same as scaledBitmap or a new one depending on blurBitmap implementation.
-            // The current blurBitmap modifies in-place, so scaledBitmap is blurredBitmap.
-            // No need to explicitly recycle blurredBitmap here if scaledBitmap is already handled.
-
 
             requireActivity().runOnUiThread(() -> {
-                if (isAdded() && blurBackground != null) { // Check if fragment is still attached
+                if (isAdded() && blurBackground != null) {
                     blurBackground.setImageBitmap(finalBitmap);
                     blurBackground.setVisibility(View.VISIBLE);
                 } else {
-                    finalBitmap.recycle(); // Recycle if view is not available to set bitmap
+                    finalBitmap.recycle();
                 }
             });
         });
@@ -211,23 +214,19 @@ public class LauncherMenuDialogFragment extends DialogFragment {
 
             blurScript = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
             blurScript.setInput(input);
-            blurScript.setRadius(Math.min(radius, 25f)); // Max radius is 25f
+            blurScript.setRadius(Math.min(radius, 25f));
             blurScript.forEach(output);
-            output.copyTo(bitmap); // Copies output back to the original bitmap
+            output.copyTo(bitmap);
         } catch (Exception e) {
             Log.e("BlurBitmap", "Error during blur: " + e.getMessage());
-            // Optionally, return an unblurred copy or a placeholder
         } finally {
-
-
             if (input != null) input.destroy();
             if (output != null) output.destroy();
             if (blurScript != null) blurScript.destroy();
             if (renderScript != null) renderScript.destroy();
         }
-        return bitmap; // Returns the blurred original bitmap
+        return bitmap;
     }
-
 
     @Override
     public void onStart() {
@@ -237,14 +236,11 @@ public class LauncherMenuDialogFragment extends DialogFragment {
             Window window = dialog.getWindow();
             if (window != null) {
                 WindowManager.LayoutParams layoutParams = window.getAttributes();
-                // Use compact width in landscape
                 boolean isLandscape = getResources().getConfiguration().orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE;
                 layoutParams.width = isLandscape ? WindowManager.LayoutParams.WRAP_CONTENT : WindowManager.LayoutParams.MATCH_PARENT;
                 layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
                 layoutParams.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
 
-                // Apply the bottom offset (taskbarHeight) as a vertical offset for the dialog window
-                // A positive 'y' value moves the dialog UP from its Gravity.BOTTOM position.
                 layoutParams.y = bottomOffset;
 
                 window.setAttributes(layoutParams);
@@ -254,6 +250,11 @@ public class LauncherMenuDialogFragment extends DialogFragment {
                 WindowCompat.setDecorFitsSystemWindows(window, false);
                 window.setStatusBarColor(Color.TRANSPARENT);
                 window.setNavigationBarColor(Color.TRANSPARENT);
+
+                // This ensures that touching outside the dialog's window will dismiss it.
+                // In conjunction with the rootLayout click listener, it provides comprehensive dismissal.
+                dialog.setCanceledOnTouchOutside(true);
+                dialog.setCancelable(true); // Ensure the dialog is cancelable
             }
         }
     }
@@ -265,7 +266,9 @@ public class LauncherMenuDialogFragment extends DialogFragment {
                 if (listener != null) {
                     listener.onClick(v);
                 }
-                dismiss();
+                // Dismiss is handled by the listener already, and if not,
+                // the default behavior would be to not dismiss.
+                // Since most listeners already call dismiss(), this is fine.
             });
         }
     }

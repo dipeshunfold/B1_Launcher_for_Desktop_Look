@@ -39,8 +39,9 @@ public class WallpaperThumbnailAdapter extends RecyclerView.Adapter<WallpaperThu
 
         Glide.with(holder.itemView.getContext())
                 .load(wallpaperResId)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .centerCrop()
+                .skipMemoryCache(true)  // Avoid stale caches
+                .diskCacheStrategy(DiskCacheStrategy.NONE)  // No disk for tiny thumbs
+                .override(160, 240)  // Force tiny size (adjust to your XML: e.g., if thumbnails are 100dp wide, use 100 * density)                .centerCrop()
                 .into(holder.thumbnail);
 
 

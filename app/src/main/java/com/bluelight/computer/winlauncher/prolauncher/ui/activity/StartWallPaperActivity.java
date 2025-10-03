@@ -60,6 +60,7 @@ public class StartWallPaperActivity extends AppCompatActivity {
         adapter = new WallpaperThumbnailAdapter(wallpaperList, wallpaperResId -> {
             Glide.with(this)
                     .load(wallpaperResId)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)  // Add this for consistency/caching, like in thumbnails
                     .centerCrop()
                     .into(imgWallpaperPreview);
         });
