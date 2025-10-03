@@ -41,6 +41,11 @@ public class AppItem {
     public String category;
     @ColumnInfo(name = "is_pinned", defaultValue = "0")
     public boolean isPinned = false;
+
+    @Ignore
+    private int originalWidth = 0;
+    @Ignore
+    private int originalHeight = 0;
     @Ignore
     public String name;
     @Ignore
@@ -100,9 +105,22 @@ public class AppItem {
     public int getColSpan() {
         return colSpan;
     }
-
+    
     public void setColSpan(int colSpan) {
         this.colSpan = colSpan;
+    }
+
+    public int getOriginalWidth() {
+        return originalWidth > 0 ? originalWidth : colSpan;
+    }
+
+    public int getOriginalHeight() {
+        return originalHeight > 0 ? originalHeight : rowSpan;
+    }
+
+    public void setOriginalDimensions(int width, int height) {
+        this.originalWidth = width;
+        this.originalHeight = height;
     }
 
     public ActivityInfo getActivityInfo() {

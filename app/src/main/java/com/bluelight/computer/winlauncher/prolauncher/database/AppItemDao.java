@@ -216,5 +216,8 @@ public interface AppItemDao {
 
     @Query("SELECT DISTINCT page_number FROM grid_items ORDER BY page_number")
     List<Integer> getAllPageIds();
+    
+    @Query("SELECT * FROM grid_items WHERE item_type = 'WIDGET'")
+    List<AppItem> getWidgetsSync();
 
 }

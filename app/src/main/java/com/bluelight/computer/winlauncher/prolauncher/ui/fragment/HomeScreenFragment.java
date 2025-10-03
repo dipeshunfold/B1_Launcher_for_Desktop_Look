@@ -32,8 +32,10 @@ import android.os.Looper;
 import android.provider.Settings;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LruCache;
+import android.util.Pair;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -570,36 +572,105 @@ public class HomeScreenFragment extends Fragment {
         super.onConfigurationChanged(newConfig);
         // Handle orientation changes
         initializeGridSize();
-        if (rootLayout != null) {
-            rootLayout.post(() -> {
-                if (!isAdded()) return;
-                int orientation = getResources().getConfiguration().orientation;
-                if (orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT) {
-                    // When coming back to portrait, fill each page up to portrait capacity by
-                    // pulling items back from the subsequent page(s)
-                    rebalancePagesForPortrait();
-                }
-                // Measure actual taskbar height if present in the Activity layout
-                int taskbarHeight = 0;
-                View taskbar = requireActivity().findViewById(R.id.lnrTaskBar);
-                if (taskbar != null) {
-                    taskbarHeight = taskbar.getHeight();
-                    if (taskbarHeight == 0) {
-                        taskbar.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-                        taskbarHeight = taskbar.getMeasuredHeight();
+
+        // Handle widget updates on a background thread
+        databaseWriteExecutor.execute(() -> {
+            try {
+                // Get widgets on background thread
+                List<AppItem> widgets = appItemDao.getWidgetsSync();
+
+                // Store widget sizes
+                final Map<Integer, Pair<Integer, Integer>> widgetSizes = new HashMap<>();
+                for (AppItem widget : widgets) {
+                    if (widget.getType() == AppItem.Type.WIDGET) {
+                        widgetSizes.put(widget.id, new Pair<>(widget.getOriginalWidth(), widget.getOriginalHeight()));
                     }
                 }
-                int dotsAndSafeDp = (orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE) ? 0 : 18;
-                int dotsAndSafePx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dotsAndSafeDp, getResources().getDisplayMetrics());
-                int reservedBottom = taskbarHeight + dotsAndSafePx;
 
-                int gridHeight = rootLayout.getHeight() - reservedBottom;
-                cellWidth = rootLayout.getWidth() / COLS;
-                cellHeight = (gridHeight > 0 ? gridHeight : 0) / ROWS;
-                // Force refresh layout after orientation change
-                forceRefreshLayoutFromDb();
-            });
+                // Update UI on main thread
+                if (rootLayout != null) {
+                    homeScreenHandler.post(() -> {
+                        if (!isAdded()) return;
+
+                        // Update all widgets to ensure proper sizing
+                        updateWidgetsOnUiThread();
+
+                        int orientation = getResources().getConfiguration().orientation;
+                        if (orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT) {
+                            // When coming back to portrait, fill each page up to portrait capacity
+                            rebalancePagesForPortrait();
+                        }
+                    });
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error in onConfigurationChanged", e);
+            }
+        });
+    }
+
+    private void updateWidgetsOnUiThread() {
+        if (!isAdded() || appItemDao == null) return;
+
+        // Get widgets on a background thread
+        databaseWriteExecutor.execute(() -> {
+            try {
+                List<AppItem> widgets = appItemDao.getWidgetsSync();
+                homeScreenHandler.post(() -> {
+                    if (!isAdded()) return;
+                    for (AppItem widget : widgets) {
+                        if (widget.getView() != null) {
+                            updateWidgetLayout(widget);
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                Log.e(TAG, "Error updating widgets", e);
+            }
+        });
+    }
+    private void updateWidgetLayout(AppItem widget) {
+        if (widget.getType() != AppItem.Type.WIDGET || widget.getView() == null) {
+            return;
         }
+
+        View view = widget.getView();
+        ViewGroup.LayoutParams params = view.getLayoutParams();
+
+        if (params == null) {
+            return;
+        }
+
+        // Calculate new dimensions based on cell size and original spans
+        int newWidth = cellWidth * widget.getOriginalWidth();
+        int newHeight = cellHeight * widget.getOriginalHeight();
+
+        // Ensure widget doesn't exceed screen bounds
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        int maxWidgetWidth = displayMetrics.widthPixels - (int) (16 * displayMetrics.density);
+        int maxWidgetHeight = displayMetrics.heightPixels - (int) (16 * displayMetrics.density);
+
+        newWidth = Math.min(newWidth, maxWidgetWidth);
+        newHeight = Math.min(newHeight, maxWidgetHeight);
+
+        // Update widget spans based on available space
+        widget.setColSpan((int) Math.ceil((float) newWidth / cellWidth));
+        widget.setRowSpan((int) Math.ceil((float) newHeight / cellHeight));
+
+        // Update layout parameters
+        params.width = newWidth;
+        params.height = newHeight;
+
+        if (params instanceof FrameLayout.LayoutParams) {
+            FrameLayout.LayoutParams frameParams = (FrameLayout.LayoutParams) params;
+            frameParams.leftMargin = widget.getCol() * cellWidth;
+            frameParams.topMargin = widget.getRow() * cellHeight;
+            view.setLayoutParams(frameParams);
+        } else {
+            view.setLayoutParams(params);
+        }
+
+        // Request layout to apply changes
+        view.requestLayout();
     }
 
     // Move overflow items from next pages back to the current page until it reaches portrait capacity (24)
@@ -1144,22 +1215,59 @@ public class HomeScreenFragment extends Fragment {
         final Context appContext = requireContext().getApplicationContext();
         final AppWidgetHostView hostView = appWidgetHost.createView(appContext, widgetItem.getAppWidgetId(), appWidgetInfo);
         hostView.setAppWidget(widgetItem.getAppWidgetId(), appWidgetInfo);
+
+        // Store original widget dimensions if not set
+        if (widgetItem.getOriginalWidth() == 0 || widgetItem.getOriginalHeight() == 0) {
+            int originalWidth = widgetItem.getColSpan();
+            int originalHeight = widgetItem.getRowSpan();
+            widgetItem.setOriginalDimensions(originalWidth, originalHeight);
+        }
+
         hostView.post(() -> {
             if (!isAdded()) return;
-            int widgetWidthPx = cellWidth * widgetItem.getColSpan();
-            int widgetHeightPx = cellHeight * widgetItem.getRowSpan();
-            int paddingPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, getResources().getDisplayMetrics());
-            float density = getResources().getDisplayMetrics().density;
+
+            // Use original dimensions for consistency across orientation changes
+            int widgetWidthPx = cellWidth * widgetItem.getOriginalWidth();
+            int widgetHeightPx = cellHeight * widgetItem.getOriginalHeight();
+
+            // Ensure widget doesn't exceed screen bounds in current orientation
+            DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+            int maxWidgetWidth = displayMetrics.widthPixels - (int) (16 * displayMetrics.density);
+            int maxWidgetHeight = displayMetrics.heightPixels - (int) (16 * displayMetrics.density);
+
+            widgetWidthPx = Math.min(widgetWidthPx, maxWidgetWidth);
+            widgetHeightPx = Math.min(widgetHeightPx, maxWidgetHeight);
+
+            // Update widget item's span based on available space
+            widgetItem.setColSpan((int) Math.ceil((float) widgetWidthPx / cellWidth));
+            widgetItem.setRowSpan((int) Math.ceil((float) widgetHeightPx / cellHeight));
+
+            // Apply padding and calculate dp values
+            int paddingPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 4, displayMetrics);
+            float density = displayMetrics.density;
+
             int minWidthDp = (int) ((widgetWidthPx - (2 * paddingPx)) / density);
             int minHeightDp = (int) ((widgetHeightPx - (2 * paddingPx)) / density);
-            int maxWidthDp = minWidthDp;
-            int maxHeightDp = minHeightDp;
+
+            // Set widget options with calculated dimensions
             Bundle options = new Bundle();
             options.putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, minWidthDp);
             options.putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, minHeightDp);
-            options.putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, maxWidthDp);
-            options.putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, maxHeightDp);
+            options.putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, minWidthDp);
+            options.putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, minHeightDp);
+
+            // Apply the widget options
             appWidgetManager.updateAppWidgetOptions(widgetItem.getAppWidgetId(), options);
+
+            // Update the widget layout parameters
+            ViewGroup.LayoutParams params = hostView.getLayoutParams();
+            if (params == null) {
+                params = new ViewGroup.LayoutParams(widgetWidthPx, widgetHeightPx);
+            } else {
+                params.width = widgetWidthPx;
+                params.height = widgetHeightPx;
+            }
+            hostView.setLayoutParams(params);
         });
         FrameLayout widgetContainer = new FrameLayout(requireContext());
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(cellWidth * widgetItem.getColSpan(), cellHeight * widgetItem.getRowSpan());
