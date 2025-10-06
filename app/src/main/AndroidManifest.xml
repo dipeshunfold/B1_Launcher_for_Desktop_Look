@@ -53,7 +53,7 @@
         android:required="false" />
 
     <application
-        android:allowBackup="false"
+        android:allowBackup="true"
         android:hardwareAccelerated="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -65,28 +65,31 @@
         <!-- New Java Intro Activity with ViewPager -->
         <activity
             android:name=".ui.activity.IntroActivity"
-            android:exported="true"
+            android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.YourAppTheme.NoActionBar">
+
+        </activity>
+
+        <!-- Old Splash Screen - disabled -->
+        <activity
+            android:name=".ui.activity.SplashActivity"
+            android:enabled="true"
+            android:exported="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- Old Splash Screen - disabled -->
-        <activity
-            android:name=".ui.activity.SplashActivity"
-            android:enabled="false"
-            android:exported="false"
-            android:screenOrientation="sensor" />
 
         <activity
             android:name=".ui.activity.LauncherActivity"
+            android:configChanges="orientation|screenSize"
             android:exported="true"
             android:launchMode="singleTask"
             android:screenOrientation="sensor"
-            android:configChanges="orientation|screenSize"
             android:stateNotNeeded="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

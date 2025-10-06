@@ -25,10 +25,11 @@ import com.bluelight.computer.winlauncher.prolauncher.R;
 import com.bluelight.computer.winlauncher.prolauncher.model.SettingsMenu;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class SettingsFragment extends Fragment {
-
 
     private RecyclerView navRecyclerView;
     private SettingsMenuAdapter menuAdapter;
@@ -37,36 +38,28 @@ public class SettingsFragment extends Fragment {
     private EditText etSearch;
     private ImageView btnBack, btnSettingRate, btnSettingShare, btnSettingClose;
     private FrameLayout settingsFragmentContainer;
-
-
+    private final Map<Class<? extends Fragment>, Fragment> fragmentCache = new HashMap<>();
     private OnSettingsClosedListener mListener;
-
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-
         if (context instanceof OnSettingsClosedListener) {
-
             mListener = (OnSettingsClosedListener) context;
         } else {
-
             throw new RuntimeException(context + " must implement OnSettingsClosedListener");
         }
     }
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
         return inflater.inflate(R.layout.fragment_settings, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
 
         navRecyclerView = view.findViewById(R.id.nav_recycler_view);
         contentTitle = view.findViewById(R.id.content_title);
@@ -77,11 +70,9 @@ public class SettingsFragment extends Fragment {
         btnSettingShare = view.findViewById(R.id.btnSettingShare);
         btnSettingRate = view.findViewById(R.id.btnSettingRate);
 
-
         setupNavigationMenu();
         setupClickListeners();
         setupSearch();
-
 
         if (savedInstanceState == null && !menuItems.isEmpty()) {
             loadSettingsFragment(menuItems.get(0));
@@ -91,29 +82,22 @@ public class SettingsFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-
         mListener = null;
     }
 
     private void setupClickListeners() {
-
         btnBack.setOnClickListener(v -> closeFragment());
         btnSettingClose.setOnClickListener(v -> closeFragment());
-
-
         btnSettingShare.setOnClickListener(v -> shareApp());
         btnSettingRate.setOnClickListener(v -> rateApp());
-
 
         requireActivity().getOnBackPressedDispatcher().addCallback(getViewLifecycleOwner(), new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-
                 closeFragment();
             }
         });
     }
-
 
     private void setupNavigationMenu() {
         navRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -133,8 +117,7 @@ public class SettingsFragment extends Fragment {
     private void setupSearch() {
         etSearch.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -142,10 +125,8 @@ public class SettingsFragment extends Fragment {
             }
 
             @Override
-            public void afterTextChanged(Editable s) {
-            }
+            public void afterTextChanged(Editable s) {}
         });
-
 
         menuAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
@@ -164,26 +145,32 @@ public class SettingsFragment extends Fragment {
         });
     }
 
-
     private void closeFragment() {
         if (mListener != null) {
             mListener.onSettingsClosed();
         }
     }
 
-
     private void loadSettingsFragment(SettingsMenu item) {
         if (item == null || item.getFragmentClass() == null) return;
+
         contentTitle.setVisibility(View.VISIBLE);
         contentTitle.setText(item.getTitle());
-        try {
-            Fragment fragment = item.getFragmentClass().getConstructor().newInstance();
-            getChildFragmentManager().beginTransaction()
-                    .replace(R.id.settings_fragment_container, fragment)
-                    .commit();
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        Fragment fragment = fragmentCache.get(item.getFragmentClass());
+        if (fragment == null) {
+            try {
+                fragment = item.getFragmentClass().newInstance();
+                fragmentCache.put(item.getFragmentClass(), fragment);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return;
+            }
         }
+
+        getChildFragmentManager().beginTransaction()
+                .replace(R.id.settings_fragment_container, fragment)
+                .commit();
     }
 
     private void shareApp() {
@@ -201,7 +188,6 @@ public class SettingsFragment extends Fragment {
         }
     }
 
-
     private void rateApp() {
         String packageName = requireActivity().getPackageName();
         try {
@@ -210,7 +196,6 @@ public class SettingsFragment extends Fragment {
             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + packageName)));
         }
     }
-
 
     public interface OnSettingsClosedListener {
         void onSettingsClosed();

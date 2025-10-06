@@ -278,57 +278,69 @@ public class AppListFragment extends Fragment implements AllAppsAdapter.AppInter
         ShapeableImageView blurBackground = binding.blurBackground;
 
         contentContainer.post(() -> {
-            if (!isAdded()) { // Crucial check within post()
+            if (!isAdded()) {
                 Log.w("BlurDebug", "Fragment not added during contentContainer.post for blur.");
                 return;
             }
-            View rootView = requireActivity().getWindow().getDecorView().findViewById(android.R.id.content);
-            Bitmap fullBitmap = Bitmap.createBitmap(rootView.getWidth(), rootView.getHeight(), Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(fullBitmap);
-            rootView.draw(canvas);
 
-            int[] location = new int[2];
-            contentContainer.getLocationOnScreen(location);
-            int x = location[0];
-            int y = location[1];
-            int width = contentContainer.getWidth();
-            int height = contentContainer.getHeight();
+            // Move bitmap processing to a background thread
+            executor.execute(() -> {
+                if (!isAdded()) return;
 
-            // Ensure coordinates are within bitmap bounds
-            x = Math.max(0, Math.min(x, fullBitmap.getWidth() - 1));
-            y = Math.max(0, Math.min(y, fullBitmap.getHeight() - 1));
-            width = Math.min(width, fullBitmap.getWidth() - x);
-            height = Math.min(height, fullBitmap.getHeight() - y);
+                // Capture a snapshot of the root view on the UI thread
+                final Bitmap[] fullBitmapHolder = new Bitmap[1];
+                contentContainer.post(() -> {
+                    if (!isAdded()) return;
+                    View rootView = requireActivity().getWindow().getDecorView().findViewById(android.R.id.content);
+                    if (rootView.getWidth() > 0 && rootView.getHeight() > 0) {
+                        fullBitmapHolder[0] = Bitmap.createBitmap(rootView.getWidth(), rootView.getHeight(), Bitmap.Config.ARGB_8888);
+                        Canvas canvas = new Canvas(fullBitmapHolder[0]);
+                        rootView.draw(canvas);
+                    }
 
-            Log.d("BlurDebug", "Position: x=" + x + ", y=" + y + ", width=" + width + ", height=" + height);
+                    // Continue processing on the background thread
+                    executor.execute(() -> {
+                        if (!isAdded() || fullBitmapHolder[0] == null) return;
 
-            // Only create bitmap if dimensions are valid
-            Bitmap croppedBitmap;
-            if (width > 0 && height > 0) {
-                croppedBitmap = Bitmap.createBitmap(fullBitmap, x, y, width, height);
-            } else {
-                croppedBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
-                Log.e("BlurDebug", "Invalid bitmap dimensions, using fallback");
-            }
-            fullBitmap.recycle();
+                        Bitmap fullBitmap = fullBitmapHolder[0];
+                        int[] location = new int[2];
+                        contentContainer.getLocationOnScreen(location);
+                        int x = location[0];
+                        int y = location[1];
+                        int width = contentContainer.getWidth();
+                        int height = contentContainer.getHeight();
 
-            float scale = 0.5f;
-            Bitmap scaledBitmap = Bitmap.createScaledBitmap(croppedBitmap,
-                    (int) (croppedBitmap.getWidth() * scale),
-                    (int) (croppedBitmap.getHeight() * scale),
-                    true);
-            croppedBitmap.recycle();
+                        x = Math.max(0, Math.min(x, fullBitmap.getWidth() - 1));
+                        y = Math.max(0, Math.min(y, fullBitmap.getHeight() - 1));
+                        width = Math.min(width, fullBitmap.getWidth() - x);
+                        height = Math.min(height, fullBitmap.getHeight() - y);
 
-            // requireContext() here is safe due to the isAdded() check above
-            Bitmap blurredBitmap = blurBitmap(scaledBitmap, requireContext(), 15f);
-            Bitmap finalBitmap = Bitmap.createScaledBitmap(blurredBitmap, width, height, true);
-            if (scaledBitmap != blurredBitmap) blurredBitmap.recycle();
+                        Bitmap croppedBitmap;
+                        if (width > 0 && height > 0) {
+                            croppedBitmap = Bitmap.createBitmap(fullBitmap, x, y, width, height);
+                        } else {
+                            croppedBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888);
+                        }
+                        fullBitmap.recycle();
 
-            requireActivity().runOnUiThread(() -> {
-                if (binding != null && isAdded()) { // Final check before UI update
-                    blurBackground.setImageBitmap(finalBitmap);
-                    blurBackground.setVisibility(View.VISIBLE);
-                }
+                        float scale = 0.5f;
+                        Bitmap scaledBitmap = Bitmap.createScaledBitmap(croppedBitmap, (int) (width * scale), (int) (height * scale), true);
+                        croppedBitmap.recycle();
+
+                        Bitmap blurredBitmap = blurBitmap(scaledBitmap, requireContext(), 15f);
+                        Bitmap finalBitmap = Bitmap.createScaledBitmap(blurredBitmap, width, height, true);
+                        if (scaledBitmap != blurredBitmap) blurredBitmap.recycle();
+
+                        if (getActivity() != null) {
+                            getActivity().runOnUiThread(() -> {
+                                if (binding != null && isAdded()) {
+                                    blurBackground.setImageBitmap(finalBitmap);
+                                    blurBackground.setVisibility(View.VISIBLE);
+                                }
+                            });
+                        }
+                    });
+                });
             });
         });
     }
@@ -500,7 +512,7 @@ public class AppListFragment extends Fragment implements AllAppsAdapter.AppInter
 
 
     private void setupAllAppsList() {
-        if (binding == null || !isAdded()) return; // Initial check
+        if (binding == null || !isAdded()) return;
 
         binding.rvAllApps.setHasFixedSize(true);
         binding.rvAllApps.setItemViewCacheSize(20);
@@ -508,38 +520,36 @@ public class AppListFragment extends Fragment implements AllAppsAdapter.AppInter
         binding.rvAllApps.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
         binding.rvAllApps.setItemAnimator(null);
 
-        binding.rvAllApps.setLayoutManager(new LinearLayoutManager(getContext())); // getContext() fine here
-        binding.rvAllApps.setAdapter(new AllAppsAdapter(getContext(), new ArrayList<>(), this)); // getContext() fine here
+        // Create adapter only once
+        AllAppsAdapter adapter = new AllAppsAdapter(getContext(), new ArrayList<>(), this);
+        binding.rvAllApps.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.rvAllApps.setAdapter(adapter);
 
+        // Load initial cached apps if available
         if (AppUtils.cachedApps != null && !AppUtils.cachedApps.isEmpty()) {
             allAppsList = new ArrayList<>(AppUtils.cachedApps);
-            AllAppsAdapter adapter = new AllAppsAdapter(getContext(), allAppsList, this); // getContext() fine here
-            binding.rvAllApps.setAdapter(adapter);
+            adapter.updateApps(allAppsList);
         }
 
-        // Capture application context for background task
+        // Fetch fresh app list in the background
         final Context applicationContext = requireContext().getApplicationContext();
-
         executor.execute(() -> {
-            List<AppInfo> freshApps = AppUtils.getInstalledApps(applicationContext); // Use captured context
-            FragmentActivity activity = getActivity();
-            if (activity == null || !isAdded()) { // Check isAdded before proceeding to UI thread
-                Log.w("AppListFragment", "Fragment not attached, skipping setupAllAppsList UI update.");
+            List<AppInfo> freshApps = AppUtils.getInstalledApps(applicationContext);
+            if (getActivity() == null || !isAdded()) {
                 return;
             }
 
-            activity.runOnUiThread(() -> {
-                if (binding == null || !isAdded()) { // Final check before UI update
-                    Log.w("AppListFragment", "Fragment not attached or binding null, skipping setupAllAppsList UI update.");
+            getActivity().runOnUiThread(() -> {
+                if (binding == null || !isAdded()) {
                     return;
                 }
 
-                boolean listHasChanged = AppUtils.cachedApps == null || AppUtils.cachedApps.size() != freshApps.size();
+                // Check if the list has actually changed before updating
+                boolean listHasChanged = allAppsList == null || allAppsList.size() != freshApps.size();
                 if (listHasChanged) {
                     AppUtils.cachedApps = new ArrayList<>(freshApps);
                     allAppsList = new ArrayList<>(freshApps);
-                    AllAppsAdapter adapter = new AllAppsAdapter(getContext(), allAppsList, this); // getContext() fine here
-                    binding.rvAllApps.setAdapter(adapter);
+                    ((AllAppsAdapter) binding.rvAllApps.getAdapter()).updateApps(allAppsList);
                 }
             });
         });

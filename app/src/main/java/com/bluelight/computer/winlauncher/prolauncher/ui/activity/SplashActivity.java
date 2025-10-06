@@ -44,7 +44,7 @@ public class SplashActivity extends AppCompatActivity {
             SharedPreferences.Editor editor = settings.edit();
             editor.putBoolean(KEY_FIRST_RUN, false);
             editor.apply();
-            navigateTo(LauncherActivity.class);
+            navigateTo(GetStartActivity.class);
         } else {
             navigateTo(LauncherActivity.class);
         }

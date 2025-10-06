@@ -6,7 +6,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.RenderEffect;
+import android.graphics.Shader;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
@@ -143,65 +146,71 @@ public class LauncherMenuDialogFragment extends DialogFragment {
                 return;
             }
 
-            View rootView = requireActivity().getWindow().getDecorView().findViewById(android.R.id.content);
-            if (rootView == null || rootView.getWidth() <= 0 || rootView.getHeight() <= 0) {
-                Log.e("BlurDebug", "Root view for blur is not ready or has zero dimensions.");
-                return;
+            // Use modern, performant RenderEffect on API 31+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                RenderEffect blurEffect = RenderEffect.createBlurEffect(40f, 40f, Shader.TileMode.MIRROR);
+                blurBackground.setRenderEffect(blurEffect);
+                blurBackground.setVisibility(View.VISIBLE);
+            } else {
+                // Fallback to the optimized RenderScript for older APIs
+                performRenderScriptBlur(contentContainer, blurBackground);
             }
-
-            Bitmap fullBitmap = Bitmap.createBitmap(rootView.getWidth(), rootView.getHeight(), Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(fullBitmap);
-            rootView.draw(canvas);
-
-            int[] location = new int[2];
-            contentContainer.getLocationOnScreen(location);
-            int x = location[0];
-            int y = location[1];
-            int width = contentContainer.getWidth();
-            int height = contentContainer.getHeight();
-
-            if (width <= 0 || height <= 0) {
-                Log.e("BlurDebug", "Content container for blur has zero dimensions.");
-                fullBitmap.recycle();
-                return;
-            }
-            Log.d("BlurDebug", "Position: x=" + x + ", y=" + y + ", width=" + width + ", height=" + height);
-
-            x = Math.max(0, x);
-            y = Math.max(0, y);
-            width = Math.min(width, fullBitmap.getWidth() - x);
-            height = Math.min(height, fullBitmap.getHeight() - y);
-
-            if (width <= 0 || height <= 0) {
-                Log.e("BlurDebug", "Cropped blur region has zero dimensions.");
-                fullBitmap.recycle();
-                return;
-            }
-
-            Bitmap croppedBitmap = Bitmap.createBitmap(fullBitmap, x, y, width, height);
-            fullBitmap.recycle();
-
-            float scale = 0.5f;
-            Bitmap scaledBitmap = Bitmap.createScaledBitmap(croppedBitmap,
-                    (int) (croppedBitmap.getWidth() * scale),
-                    (int) (croppedBitmap.getHeight() * scale),
-                    true);
-            croppedBitmap.recycle();
-
-            Bitmap blurredBitmap = blurBitmap(scaledBitmap, requireContext(), 15f);
-            Bitmap finalBitmap = Bitmap.createScaledBitmap(blurredBitmap, width, height, true);
-
-            requireActivity().runOnUiThread(() -> {
-                if (isAdded() && blurBackground != null) {
-                    blurBackground.setImageBitmap(finalBitmap);
-                    blurBackground.setVisibility(View.VISIBLE);
-                } else {
-                    finalBitmap.recycle();
-                }
-            });
         });
     }
 
+    private void performRenderScriptBlur(LinearLayout contentContainer, ShapeableImageView blurBackground) {
+        View rootView = requireActivity().getWindow().getDecorView().findViewById(android.R.id.content);
+        if (rootView == null || rootView.getWidth() <= 0 || rootView.getHeight() <= 0) {
+            Log.e("BlurDebug", "Root view for blur is not ready or has zero dimensions.");
+            return;
+        }
+
+        Bitmap fullBitmap = Bitmap.createBitmap(rootView.getWidth(), rootView.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(fullBitmap);
+        rootView.draw(canvas);
+
+        int[] location = new int[2];
+        contentContainer.getLocationOnScreen(location);
+        int x = location[0];
+        int y = location[1];
+        int width = contentContainer.getWidth();
+        int height = contentContainer.getHeight();
+
+        if (width <= 0 || height <= 0) {
+            fullBitmap.recycle();
+            return;
+        }
+
+        x = Math.max(0, x);
+        y = Math.max(0, y);
+        width = Math.min(width, fullBitmap.getWidth() - x);
+        height = Math.min(height, fullBitmap.getHeight() - y);
+
+        if (width <= 0 || height <= 0) {
+            fullBitmap.recycle();
+            return;
+        }
+
+        Bitmap croppedBitmap = Bitmap.createBitmap(fullBitmap, x, y, width, height);
+        fullBitmap.recycle();
+
+        // Scaling down is a key optimization for RenderScript performance
+        float scale = 0.25f;
+        Bitmap scaledBitmap = Bitmap.createScaledBitmap(croppedBitmap, (int) (width * scale), (int) (height * scale), true);
+        croppedBitmap.recycle();
+
+        // The blur radius should be adjusted based on the scale
+        Bitmap blurredBitmap = blurBitmap(scaledBitmap, requireContext(), 10f);
+
+        requireActivity().runOnUiThread(() -> {
+            if (isAdded() && blurBackground != null) {
+                blurBackground.setImageBitmap(blurredBitmap);
+                blurBackground.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    // Keep RenderScript for older APIs
     private Bitmap blurBitmap(Bitmap bitmap, Context context, float radius) {
         RenderScript renderScript = null;
         Allocation input = null;
@@ -211,8 +220,8 @@ public class LauncherMenuDialogFragment extends DialogFragment {
             renderScript = RenderScript.create(context);
             input = Allocation.createFromBitmap(renderScript, bitmap);
             output = Allocation.createTyped(renderScript, input.getType());
-
             blurScript = ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript));
+
             blurScript.setInput(input);
             blurScript.setRadius(Math.min(radius, 25f));
             blurScript.forEach(output);

@@ -1120,13 +1120,13 @@ public class HomeScreenFragment extends Fragment {
             float factor;
             switch (currentSizePref) {
                 case PreferenceHelper.ICON_SIZE_SMALL:
-                    factor = 1.55f; // Increased significantly
+                    factor = 1.40f; // Smallest for landscape
                     break;
                 case PreferenceHelper.ICON_SIZE_LARGE:
-                    factor = 1.55f; // Much larger
+                    factor = 1.55f; // Largest for landscape
                     break;
                 default:
-                    factor = 1.55f; // Noticeably larger
+                    factor = 1.50f; // Default medium for landscape
                     break;
             }
             iconSize = Math.max(1, (int) (baseSize * factor));
@@ -1134,13 +1134,13 @@ public class HomeScreenFragment extends Fragment {
             // Portrait: preserve previous behavior exactly (do not change approved look)
             switch (currentSizePref) {
                 case PreferenceHelper.ICON_SIZE_SMALL:
-                    iconSize = (int) (cellWidth * 0.50f);
+                    iconSize = (int) (cellWidth * 0.55f);
                     break;
                 case PreferenceHelper.ICON_SIZE_LARGE:
-                    iconSize = (int) (cellWidth * 0.70f);
+                    iconSize = (int) (cellWidth * 0.65f);
                     break;
                 default:
-                    iconSize = (int) (cellWidth * 0.63f);
+                    iconSize = (int) (cellWidth * 0.60f);
                     break;
             }
         }
@@ -2429,14 +2429,8 @@ public class HomeScreenFragment extends Fragment {
                 listener.startCrossPageDrag(appItem, iconBitmap, initialRect, pageIndex,
                         appItem.getRow(), appItem.getCol(), currentRawX, currentRawY);
 
-                // FIX: Make the original view invisible during drag
+                // Make the original view invisible during drag
                 view.setVisibility(View.INVISIBLE);
-
-                // FIX: Remove these visual feedback changes from the original view.
-                // These should be applied to the drag overlay in LauncherActivity if desired.
-                // view.setScaleX(1.2f);
-                // view.setScaleY(1.2f);
-                // view.setAlpha(0.7f);
 
                 isDragging = true;
             }
@@ -2444,38 +2438,23 @@ public class HomeScreenFragment extends Fragment {
 
         @Override
         void onDrag(MotionEvent event) {
-            if (!isDragging && isLongPressTriggered) {
-                if (pendingMoveEvent != null) {
-                    pendingMoveEvent.recycle();
-                }
-                pendingMoveEvent = MotionEvent.obtain(event);
-            }
-
             if (isDragging) {
-                // FIX: DO NOT move the original view. The drag overlay (managed by listener) moves.
-                // float newX = event.getRawX() - touchOffsetX;
-                // float newY = event.getRawY() - touchOffsetY;
-                // view.setX(newX);
-                // view.setY(newY);
-
-                if (listener != null)
-                    listener.onCrossPageDragMove(event.getRawX(), event.getRawY()); // This moves the overlay
+                // The drag overlay is moved by the listener, so we don't move the original view.
+                if (listener != null) listener.onCrossPageDragMove(event.getRawX(), event.getRawY());
             }
         }
 
         @Override
         void onDragEnd(MotionEvent event) {
-            if (pendingMoveEvent != null) {
-                pendingMoveEvent.recycle();
-                pendingMoveEvent = null;
-            }
-
-            // FIX: Make the original view visible again. Its final position will be set by syncLayoutWithDb.
+            // Make the original view visible again. Its final position will be set by syncLayoutWithDb.
             view.setVisibility(View.VISIBLE);
-            // FIX: Ensure alpha and scale are reset for the original view
+
+            // Ensure alpha and scale are reset for the original view
             view.setAlpha(1.0f);
             view.setScaleX(1.0f);
             view.setScaleY(1.0f);
+            view.setTranslationX(0f);
+            view.setTranslationY(0f);
         }
 
         @Override

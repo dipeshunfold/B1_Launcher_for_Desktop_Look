@@ -29,22 +29,26 @@ public class AllAppsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     private static final int TYPE_HEADER = 0;
     private static final int TYPE_ITEM = 1;
     private static final int DEFAULT_ICON_SIZE = 100;
+
     private final Context context;
     private final List<AppInfo> fullAppsList;
     private final List<Object> itemsList = new ArrayList<>();
     private final AppInteractionListener listener;
 
-
     public AllAppsAdapter(Context context, List<AppInfo> appsList, AppInteractionListener listener) {
         this.context = context;
         this.listener = listener;
-
-        Collections.sort(appsList, Comparator.comparing(app -> app.label.toString().toLowerCase()));
         this.fullAppsList = new ArrayList<>(appsList);
-
         setHasStableIds(true);
+        updateApps(appsList);
+    }
 
-        updateList(processAppsWithHeaders(this.fullAppsList));
+    public void updateApps(List<AppInfo> newAppsList) {
+        Collections.sort(newAppsList, Comparator.comparing(app -> app.label.toString().toLowerCase()));
+        this.fullAppsList.clear();
+        this.fullAppsList.addAll(newAppsList);
+        List<Object> newProcessedList = processAppsWithHeaders(this.fullAppsList);
+        updateList(newProcessedList);
     }
 
     private List<Object> processAppsWithHeaders(List<AppInfo> apps) {
@@ -60,6 +64,13 @@ public class AllAppsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             processedList.add(app);
         }
         return processedList;
+    }
+
+    private void updateList(List<Object> newList) {
+        DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new AppDiffCallback(itemsList, newList), false);
+        itemsList.clear();
+        itemsList.addAll(newList);
+        diffResult.dispatchUpdatesTo(this);
     }
 
     @Override
@@ -98,15 +109,14 @@ public class AllAppsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
             appHolder.appName.setText(app.label);
 
-
             Glide.with(context)
                     .load(app.icon)
                     .override(DEFAULT_ICON_SIZE, DEFAULT_ICON_SIZE)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(appHolder.appIcon);
+
             appHolder.itemView.setOnClickListener(v -> {
-                Intent launchIntent = context.getPackageManager()
-                        .getLaunchIntentForPackage((String) app.packageName);
+                Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage((String) app.packageName);
                 if (launchIntent != null) {
                     context.startActivity(launchIntent);
                 }
@@ -132,20 +142,17 @@ public class AllAppsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
                 List<AppInfo> filteredApps;
-
                 if (constraint == null || constraint.length() == 0) {
                     filteredApps = new ArrayList<>(fullAppsList);
                 } else {
                     String filterPattern = constraint.toString().toLowerCase().trim();
                     filteredApps = new ArrayList<>();
                     for (AppInfo app : fullAppsList) {
-                        if (app.label != null &&
-                                app.label.toString().toLowerCase().contains(filterPattern)) {
+                        if (app.label != null && app.label.toString().toLowerCase().contains(filterPattern)) {
                             filteredApps.add(app);
                         }
                     }
                 }
-
                 FilterResults results = new FilterResults();
                 results.values = processAppsWithHeaders(filteredApps);
                 return results;
@@ -154,22 +161,10 @@ public class AllAppsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
                 if (results.values instanceof List) {
-                    List<Object> newItems = (List<Object>) results.values;
-                    if (!itemsList.equals(newItems)) {
-                        updateList(newItems);
-                    }
+                    updateList((List<Object>) results.values);
                 }
             }
         };
-    }
-
-    private void updateList(List<Object> newList) {
-        DiffUtil.DiffResult diffResult =
-                DiffUtil.calculateDiff(new AppDiffCallback(itemsList, newList), false);
-
-        itemsList.clear();
-        itemsList.addAll(newList);
-        diffResult.dispatchUpdatesTo(this);
     }
 
     public interface AppInteractionListener {
@@ -220,7 +215,6 @@ public class AllAppsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
             Object oldItem = oldList.get(oldItemPosition);
             Object newItem = newList.get(newItemPosition);
-
             if (oldItem instanceof AppInfo && newItem instanceof AppInfo) {
                 return ((AppInfo) oldItem).packageName.equals(((AppInfo) newItem).packageName);
             } else if (oldItem instanceof String && newItem instanceof String) {
@@ -233,7 +227,6 @@ public class AllAppsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
             Object oldItem = oldList.get(oldItemPosition);
             Object newItem = newList.get(newItemPosition);
-
             if (oldItem instanceof AppInfo && newItem instanceof AppInfo) {
                 return ((AppInfo) oldItem).label.equals(((AppInfo) newItem).label);
             } else if (oldItem instanceof String && newItem instanceof String) {
