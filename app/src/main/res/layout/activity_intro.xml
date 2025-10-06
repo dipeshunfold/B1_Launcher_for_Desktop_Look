@@ -16,6 +16,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/_15sdp"
         android:padding="16dp">
 
         <!-- Dots Indicator - Centered in parent -->
@@ -38,16 +39,16 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:minWidth="80dp"
-            android:gravity="center"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:clickable="true"
+            android:focusable="true"
             android:fontFamily="@font/arimo_bold_font"
+            android:gravity="center"
+            android:minWidth="80dp"
             android:text="@string/next"
             android:textColor="@color/colorPrimary"
             android:textSize="@dimen/_12ssp"
-            android:visibility="invisible"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:clickable="true"
-            android:focusable="true" />
+            android:visibility="invisible" />
 
     </RelativeLayout>
 

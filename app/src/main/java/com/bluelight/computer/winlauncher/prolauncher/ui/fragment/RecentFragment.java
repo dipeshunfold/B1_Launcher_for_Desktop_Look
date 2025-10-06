@@ -1,6 +1,5 @@
 package com.bluelight.computer.winlauncher.prolauncher.ui.fragment;
 
-import android.app.ActivityManager;
 import android.app.AppOpsManager;
 import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
@@ -12,8 +11,6 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.provider.Settings;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
@@ -44,18 +41,12 @@ import com.google.android.material.imageview.ShapeableImageView;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 public class RecentFragment extends Fragment {
 
-    private AppGridAdapter adapter;
-    private Handler refreshHandler;
-    private Runnable refreshRunnable;
-    private static final int REFRESH_INTERVAL = 2000; // 2 seconds
 
     @Nullable
     @Override
@@ -194,268 +185,36 @@ public class RecentFragment extends Fragment {
     }
 
     private void setupRecyclerView(View view) {
+        UsageStatsManager usm = (UsageStatsManager) requireContext().getSystemService(Context.USAGE_STATS_SERVICE);
+        long currentTime = System.currentTimeMillis();
+        long startTime = currentTime - 1000L * 3600 * 24 * 7;
+        Map<String, UsageStats> aggregatedStats = usm.queryAndAggregateUsageStats(startTime, currentTime);
+        List<UsageStats> usageStatsList = new ArrayList<>(aggregatedStats.values());
+        Collections.sort(usageStatsList, (o1, o2) -> Long.compare(o2.getLastTimeUsed(), o1.getLastTimeUsed()));
+
+        PackageManager pm = requireContext().getPackageManager();
+        List<AppInfos> appList = new ArrayList<>();
+        int count = 0;
+        for (UsageStats stats : usageStatsList) {
+            if (count >= 9) break;
+            try {
+                if (stats.getLastTimeUsed() == 0) continue;
+
+                ApplicationInfo appInfo = pm.getApplicationInfo(stats.getPackageName(), 0);
+                if (!appInfo.packageName.equals(requireContext().getPackageName()) && (appInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
+                    String appName = pm.getApplicationLabel(appInfo).toString();
+                    Drawable appIcon = pm.getApplicationIcon(appInfo);
+                    String packageName = stats.getPackageName();
+                    appList.add(new AppInfos(appName, appIcon, packageName));
+                    count++;
+                }
+            } catch (PackageManager.NameNotFoundException e) {
+            }
+        }
+
         RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
-        adapter = new AppGridAdapter(new ArrayList<>(), getContext());
-        recyclerView.setAdapter(adapter);
-        refreshHandler = new Handler(Looper.getMainLooper());
-        refreshRunnable = new Runnable() {
-            @Override
-            public void run() {
-                refreshRecentApps();
-                refreshHandler.postDelayed(this, REFRESH_INTERVAL);
-            }
-        };
-        refreshHandler.post(refreshRunnable);
-    }
-
-    private void refreshRecentApps() {
-        UsageStatsManager usm = (UsageStatsManager) requireContext().getSystemService(Context.USAGE_STATS_SERVICE);
-        ActivityManager activityManager = (ActivityManager) requireContext().getSystemService(Context.ACTIVITY_SERVICE);
-        PackageManager pm = requireContext().getPackageManager();
-
-        List<AppInfos> appList = new ArrayList<>();
-        Set<String> addedPackages = new HashSet<>();
-
-        long currentTime = System.currentTimeMillis();
-
-        // Try multiple approaches to get recent apps
-        Log.d("RecentFragment", "Starting recent apps detection...");
-
-        // Approach 1: Try getRecentTasks (might work on some devices)
-        try {
-            @SuppressWarnings("deprecation")
-            List<ActivityManager.RecentTaskInfo> recentTasks = activityManager.getRecentTasks(20, 0);
-            Log.d("RecentFragment", "getRecentTasks returned " + recentTasks.size() + " tasks");
-
-            for (ActivityManager.RecentTaskInfo taskInfo : recentTasks) {
-                if (appList.size() >= 9) break;
-
-                if (taskInfo.baseIntent != null && taskInfo.baseIntent.getComponent() != null) {
-                    String packageName = taskInfo.baseIntent.getComponent().getPackageName();
-
-                    if (!addedPackages.contains(packageName) &&
-                            !packageName.equals(requireContext().getPackageName()) &&
-                            !isSystemLauncherApp(packageName)) {
-
-                        if (addAppToList(packageName, pm, appList, addedPackages)) {
-                            Log.d("RecentFragment", "Added from recent tasks: " + packageName);
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            Log.w("RecentFragment", "getRecentTasks failed: " + e.getMessage());
-        }
-
-        // Approach 2: Use very recent usage stats (last 10 minutes) for apps that were just used
-        if (appList.size() < 9) {
-            Log.d("RecentFragment", "Trying usage stats approach...");
-
-            long[] timeWindows = {
-                    5 * 60 * 1000,   // 5 minutes
-                    10 * 60 * 1000,  // 10 minutes
-                    30 * 60 * 1000,  // 30 minutes
-                    60 * 60 * 1000   // 1 hour
-            };
-
-            for (long timeWindow : timeWindows) {
-                if (appList.size() >= 9) break;
-
-                long startTime = currentTime - timeWindow;
-
-                try {
-                    Map<String, UsageStats> stats = usm.queryAndAggregateUsageStats(startTime, currentTime);
-                    Log.d("RecentFragment", "Usage stats for last " + (timeWindow / 60000) + " minutes: " +
-                            (stats != null ? stats.size() : 0) + " apps");
-
-                    if (stats != null && !stats.isEmpty()) {
-                        List<UsageStats> sortedStats = new ArrayList<>();
-
-                        for (UsageStats stat : stats.values()) {
-                            // Look for apps that were used recently and had meaningful interaction
-                            if (stat.getLastTimeUsed() > startTime &&
-                                    stat.getTotalTimeInForeground() > 1000) { // At least 1 second
-                                sortedStats.add(stat);
-                            }
-                        }
-
-                        // Sort by last used time (most recent first)
-                        Collections.sort(sortedStats, (a, b) -> Long.compare(b.getLastTimeUsed(), a.getLastTimeUsed()));
-
-                        for (UsageStats stat : sortedStats) {
-                            if (appList.size() >= 9) break;
-
-                            String packageName = stat.getPackageName();
-
-                            if (!addedPackages.contains(packageName) &&
-                                    !packageName.equals(requireContext().getPackageName()) &&
-                                    !isSystemLauncherApp(packageName)) {
-
-                                if (addAppToList(packageName, pm, appList, addedPackages)) {
-                                    long minutesAgo = (currentTime - stat.getLastTimeUsed()) / (60 * 1000);
-                                    Log.d("RecentFragment", "Added from usage stats: " + packageName +
-                                            " (used " + minutesAgo + " minutes ago)");
-                                }
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    Log.w("RecentFragment", "Usage stats failed for " + (timeWindow / 60000) + " minutes: " + e.getMessage());
-                }
-            }
-        }
-
-        // Approach 3: Try running app processes (for apps that might still be active)
-        if (appList.size() < 9) {
-            Log.d("RecentFragment", "Trying running processes approach...");
-
-            try {
-                List<ActivityManager.RunningAppProcessInfo> runningProcesses = activityManager.getRunningAppProcesses();
-                if (runningProcesses != null) {
-                    Log.d("RecentFragment", "Found " + runningProcesses.size() + " running processes");
-
-                    // Sort by importance (foreground apps first)
-                    Collections.sort(runningProcesses, (a, b) -> Integer.compare(a.importance, b.importance));
-
-                    for (ActivityManager.RunningAppProcessInfo processInfo : runningProcesses) {
-                        if (appList.size() >= 9) break;
-
-                        // Only consider foreground and visible apps
-                        if (processInfo.importance <= ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE) {
-                            for (String packageName : processInfo.pkgList) {
-                                if (appList.size() >= 9) break;
-
-                                if (!addedPackages.contains(packageName) &&
-                                        !packageName.equals(requireContext().getPackageName()) &&
-                                        !isSystemLauncherApp(packageName)) {
-
-                                    if (addAppToList(packageName, pm, appList, addedPackages)) {
-                                        Log.d("RecentFragment", "Added from running processes: " + packageName);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                Log.w("RecentFragment", "Running processes failed: " + e.getMessage());
-            }
-        }
-
-        Log.d("RecentFragment", "Final result: " + appList.size() + " recent apps found");
-        if (appList.size() == 0) {
-            Log.d("RecentFragment", "No recent apps found");
-        }
-        adapter.updateAppList(appList);
-    }
-
-    private boolean addAppToList(String packageName, PackageManager pm, List<AppInfos> appList, Set<String> addedPackages) {
-        try {
-            ApplicationInfo appInfo = pm.getApplicationInfo(packageName, 0);
-
-            // Include all user apps and important system apps
-            if (shouldIncludeApp(appInfo, packageName)) {
-                String appName = pm.getApplicationLabel(appInfo).toString();
-                Drawable appIcon = pm.getApplicationIcon(appInfo);
-                appList.add(new AppInfos(appName, appIcon, packageName));
-                addedPackages.add(packageName);
-                return true;
-            }
-        } catch (PackageManager.NameNotFoundException e) {
-            Log.w("RecentFragment", "App not found: " + packageName);
-        }
-        return false;
-    }
-
-    private boolean shouldIncludeApp(ApplicationInfo appInfo, String packageName) {
-        // Always include non-system apps (user-installed apps)
-        if ((appInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
-            return true;
-        }
-
-        // For system apps, be more inclusive
-        String packageLower = packageName.toLowerCase();
-
-        // Include common system apps that users interact with
-        return isImportantSystemApp(packageName) ||
-                packageLower.contains("filemanager") ||
-                packageLower.contains("files") ||
-                packageLower.contains("cleaner") ||
-                packageLower.contains("manager") ||
-                packageLower.contains("gallery") ||
-                packageLower.contains("camera") ||
-                packageLower.contains("music") ||
-                packageLower.contains("video") ||
-                packageLower.contains("photo") ||
-                packageLower.contains("dialer") ||
-                packageLower.contains("phone") ||
-                packageLower.contains("messaging") ||
-                packageLower.contains("mms") ||
-                packageLower.contains("sms") ||
-                packageLower.contains("calculator") ||
-                packageLower.contains("clock") ||
-                packageLower.contains("calendar") ||
-                packageLower.contains("settings") ||
-                packageLower.contains("contacts") ||
-                packageLower.contains("browser") ||
-                packageLower.contains("chrome") ||
-                packageLower.contains("maps") ||
-                packageLower.contains("gmail") ||
-                packageLower.contains("drive") ||
-                packageLower.contains("youtube") ||
-                packageLower.contains("playstore") ||
-                packageLower.contains("store") ||
-                // Check for typical manufacturer apps
-                packageLower.contains("miui") ||
-                packageLower.contains("xiaomi") ||
-                packageLower.contains("samsung") ||
-                packageLower.contains("huawei") ||
-                packageLower.contains("oppo") ||
-                packageLower.contains("vivo") ||
-                packageLower.contains("oneplus");
-    }
-
-    private boolean isSystemLauncherApp(String packageName) {
-        // Don't include system launcher apps or our own launcher
-        if (packageName.equals(requireContext().getPackageName())) {
-            return true;
-        }
-
-        // Check if it's a system launcher
-        Intent homeIntent = new Intent(Intent.ACTION_MAIN);
-        homeIntent.addCategory(Intent.CATEGORY_HOME);
-        PackageManager pm = requireContext().getPackageManager();
-
-        try {
-            List<android.content.pm.ResolveInfo> resolveInfos = pm.queryIntentActivities(homeIntent, 0);
-            for (android.content.pm.ResolveInfo resolveInfo : resolveInfos) {
-                if (packageName.equals(resolveInfo.activityInfo.packageName)) {
-                    // Check if it's a system app launcher
-                    ApplicationInfo appInfo = pm.getApplicationInfo(packageName, 0);
-                    return (appInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
-                }
-            }
-        } catch (Exception e) {
-            Log.w("RecentFragment", "Error checking launcher apps", e);
-        }
-
-        return false;
-    }
-
-    private boolean isImportantSystemApp(String packageName) {
-        // Include some important system apps that users might want to see in recent
-        return packageName.contains("chrome") ||
-                packageName.contains("browser") ||
-                packageName.contains("camera") ||
-                packageName.contains("gallery") ||
-                packageName.contains("music") ||
-                packageName.contains("video") ||
-                packageName.contains("phone") ||
-                packageName.contains("contacts") ||
-                packageName.contains("messages") ||
-                packageName.contains("email") ||
-                packageName.contains("calendar");
+        recyclerView.setAdapter(new AppGridAdapter(appList, getContext()));
     }
 
     private boolean hasUsageStatsPermission() {
@@ -470,29 +229,6 @@ public class RecentFragment extends Fragment {
         }
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (refreshHandler != null && refreshRunnable != null) {
-            refreshHandler.removeCallbacks(refreshRunnable);
-        }
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (refreshHandler != null && refreshRunnable != null) {
-            refreshHandler.post(refreshRunnable);
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (refreshHandler != null && refreshRunnable != null) {
-            refreshHandler.removeCallbacks(refreshRunnable);
-        }
-    }
 
     public class AppGridAdapter extends RecyclerView.Adapter<AppGridAdapter.ViewHolder> {
 

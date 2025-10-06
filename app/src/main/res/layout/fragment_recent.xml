@@ -64,20 +64,6 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/txt"
                 android:layout_margin="@dimen/_8sdp" />
-                
-            <TextView
-                android:id="@+id/empty_view"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/txt"
-                android:layout_margin="@dimen/_8sdp"
-                android:gravity="center"
-                android:padding="@dimen/_10sdp"
-                android:text="No background apps running"
-                android:textColor="@color/black"
-                android:textSize="@dimen/_10ssp"
-                android:visibility="gone"
-                android:fontFamily="@font/arimo_regular_font" />
         </RelativeLayout>
     </androidx.cardview.widget.CardView>
 

@@ -190,14 +190,53 @@ public interface AppItemDao {
             }
         }
 
-        // Search from bottom-right to top-left
-        for (int r = totalRows - 1; r >= 0; r--) {
-            for (int c = totalCols - 1; c >= 0; c--) {
+        // Find the last occupied cell in column-first order (left to right, top to bottom)
+        int lastOccupiedRow = -1;
+        int lastOccupiedCol = -1;
+        
+        for (int c = 0; c < totalCols; c++) {
+            for (int r = 0; r < totalRows; r++) {
+                if (occupied[r][c]) {
+                    lastOccupiedCol = c;
+                    lastOccupiedRow = r;
+                }
+            }
+        }
+
+        // If no items on page, return first cell
+        if (lastOccupiedRow == -1 && lastOccupiedCol == -1) {
+            return new int[]{0, 0, pageId};
+        }
+
+        // Find the next free cell after the last occupied cell in column-first order
+        // Start from the cell after the last occupied one
+        boolean searchStarted = false;
+        for (int c = 0; c < totalCols; c++) {
+            for (int r = 0; r < totalRows; r++) {
+                // Skip until we pass the last occupied cell
+                if (!searchStarted) {
+                    if (c == lastOccupiedCol && r == lastOccupiedRow) {
+                        searchStarted = true;
+                    }
+                    continue;
+                }
+                
+                // Found a free cell after the last occupied one
                 if (!occupied[r][c]) {
                     return new int[]{r, c, pageId};
                 }
             }
         }
+
+        // No free cell found after last occupied, search from beginning
+        for (int c = 0; c < totalCols; c++) {
+            for (int r = 0; r < totalRows; r++) {
+                if (!occupied[r][c]) {
+                    return new int[]{r, c, pageId};
+                }
+            }
+        }
+
         return null;
     }
     @Query("SELECT * FROM grid_items WHERE is_pinned = 1")

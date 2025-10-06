@@ -187,6 +187,11 @@ public class LauncherActivity extends AppCompatActivity implements HomeScreenFra
     private int mDragItemOriginalRow;
     private int mDragItemOriginalCol;
     private float mDragOffsetX, mDragOffsetY;
+    private float mBaseX, mBaseY; // anchor position of drag view
+    private int mOverlayOffsetX, mOverlayOffsetY; // overlay's location on screen
+    private int mScreenWidth;
+    private float mLeftEdgeThreshold, mRightEdgeThreshold;
+    private int mEdgeZone = 0; // -1 left, 0 none, 1 right
     private boolean isCrossPageDragging = false;
     private boolean mWasDragging = false;
     private final Handler mPageScrollHandler = new Handler(Looper.getMainLooper());
@@ -1502,8 +1507,8 @@ public class LauncherActivity extends AppCompatActivity implements HomeScreenFra
         mWasDragging = true;
         Log.d(TAG, "startCrossPageDrag: mDragItem set to " + mDragItem.getName() + " (ID: " + mDragItem.id + ") from Page: " + mOriginalPageIndex);
 
-        // Hide the original item view in the source fragment
-        removeItemFromPage(item);
+        // Do NOT remove the original view immediately; keep it to preserve the ongoing touch stream.
+        // The fragment temporarily dims the original view; a layout refresh after drop will rebuild views.
 
         // Create drag view with improved visual feedback
         if (mDragView == null) {
@@ -1514,25 +1519,52 @@ public class LauncherActivity extends AppCompatActivity implements HomeScreenFra
         mDragView.setAlpha(0.95f);
         mDragView.setElevation(16f);
 
-        // Set initial position and size with smooth scaling
+        // Determine overlay's on-screen offset to translate raw to parent coordinates
+        int[] overlayCoords = new int[2];
+        mDragOverlay.getLocationOnScreen(overlayCoords);
+        mOverlayOffsetX = overlayCoords[0];
+        mOverlayOffsetY = overlayCoords[1];
+
+        // Set initial position and size with correct parent-relative coordinates
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(initialRect.width(), initialRect.height());
         mDragView.setLayoutParams(params);
-        mDragView.setX(initialRect.left);
-        mDragView.setY(initialRect.top);
+        mDragView.setX(initialRect.left - mOverlayOffsetX);
+        mDragView.setY(initialRect.top - mOverlayOffsetY);
         // Remove aggressive scale to avoid pop effect
         mDragView.setScaleX(1.0f);
         mDragView.setScaleY(1.0f);
+        mDragView.setTranslationX(0f);
+        mDragView.setTranslationY(0f);
 
-        // Calculate offset from top-left of the view to the touch point
+        // Calculate offset from top-left of the view to the touch point (screen space)
         mDragOffsetX = initialTouchRawX - initialRect.left;
         mDragOffsetY = initialTouchRawY - initialRect.top;
 
+        // Cache base position in overlay-parent coordinates
+        mBaseX = initialRect.left - mOverlayOffsetX;
+        mBaseY = initialRect.top - mOverlayOffsetY;
+        DisplayMetrics dm = getResources().getDisplayMetrics();
+        mScreenWidth = dm.widthPixels;
+        mLeftEdgeThreshold = mScreenWidth * EDGE_SCROLL_THRESHOLD_RATIO;
+        mRightEdgeThreshold = mScreenWidth * (1.0f - EDGE_SCROLL_THRESHOLD_RATIO);
+        mEdgeZone = 0;
+
+        // Enable hardware layer for smooth translations during drag
+        mDragView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        mDragView.setHasTransientState(true);
+
+        // Ensure overlay is on top and interactive
         mDragOverlay.setVisibility(View.VISIBLE);
+        mDragOverlay.bringToFront();
+        mDragOverlay.setClickable(true);
+        mDragOverlay.setFocusable(false);
         mDragOverlay.setOnTouchListener(new ImprovedDragOverlayTouchListener());
+        mDragOverlay.requestLayout();
+        mDragOverlay.invalidate();
         // Make sure parents do not intercept during cross-page drag
         requestDisallowInterceptTouchEvent(true);
 
-        requestDisallowInterceptTouchEvent(true);
+        // Removed duplicate disallowIntercept call
     }
 
     private void revertDraggedItemToOriginalPosition() {
@@ -1677,6 +1709,70 @@ public class LauncherActivity extends AppCompatActivity implements HomeScreenFra
     @Override
     public HomeScreenAdapter getPagerAdapter() {
         return pagerAdapter;
+    }
+
+    @Override
+    public void onCrossPageDragMove(float rawX, float rawY) {
+        if (!isCrossPageDragging || mDragView == null) return;
+
+        try {
+            // Ensure overlay remains visible (no repeated bringToFront to reduce churn)
+            if (mDragOverlay.getVisibility() != View.VISIBLE) {
+                mDragOverlay.setVisibility(View.VISIBLE);
+            }
+
+            // Update drag view position using parent-relative coordinates for exact finger alignment
+            float targetX = rawX - mDragOffsetX - mOverlayOffsetX;
+            float targetY = rawY - mDragOffsetY - mOverlayOffsetY;
+            mDragView.setX(targetX);
+            mDragView.setY(targetY);
+
+            // Debounced edge scroll handling
+            int newZone = 0; // 0 = none, -1 = left, 1 = right
+            if (rawX < mLeftEdgeThreshold) {
+                newZone = -1;
+            } else if (rawX > mRightEdgeThreshold) {
+                newZone = 1;
+            }
+
+            if (newZone != mEdgeZone) {
+                // Update scroll scheduling and visual feedback only when zone changes
+                if (newZone == -1 && viewPager.getCurrentItem() > 0) {
+                    mPageScrollHandler.removeCallbacks(mScrollRightRunnable);
+                    mPageScrollHandler.postDelayed(mScrollLeftRunnable, PAGE_SCROLL_DELAY_MS);
+                    mDragView.setAlpha(0.8f);
+                } else if (newZone == 1 && viewPager.getCurrentItem() < pagerAdapter.getItemCount() - 1) {
+                    mPageScrollHandler.removeCallbacks(mScrollLeftRunnable);
+                    mPageScrollHandler.postDelayed(mScrollRightRunnable, PAGE_SCROLL_DELAY_MS);
+                    mDragView.setAlpha(0.8f);
+                } else {
+                    mPageScrollHandler.removeCallbacks(mScrollLeftRunnable);
+                    mPageScrollHandler.removeCallbacks(mScrollRightRunnable);
+                    mDragView.setAlpha(0.95f);
+                }
+                mEdgeZone = newZone;
+            }
+
+            mWasDragging = true;
+        } catch (Exception e) {
+            Log.e(TAG, "onCrossPageDragMove error: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void onCrossPageDragEnd(float rawX, float rawY) {
+        if (!isCrossPageDragging) return;
+        try {
+            // Synthesize an ACTION_UP event to reuse existing drop logic
+            long now = android.os.SystemClock.uptimeMillis();
+            MotionEvent up = MotionEvent.obtain(now, now, MotionEvent.ACTION_UP, rawX, rawY, 0);
+            stopCrossPageDrag(up);
+            up.recycle();
+        } catch (Exception e) {
+            Log.e(TAG, "onCrossPageDragEnd error: " + e.getMessage(), e);
+            // Fallback: revert if anything goes wrong
+            revertDraggedItemToOriginalPosition();
+        }
     }
 
     private void cleanupDragState() {
@@ -1834,7 +1930,7 @@ public class LauncherActivity extends AppCompatActivity implements HomeScreenFra
                     .scaleX(1.0f)
                     .scaleY(1.0f)
                     .alpha(1.0f)
-                    .setDuration(250)
+                    .setDuration(50)
                     .withEndAction(() -> {
                         cleanupDragOverlay();
 
@@ -1856,6 +1952,10 @@ public class LauncherActivity extends AppCompatActivity implements HomeScreenFra
 
     private void cleanupDragOverlay() {
         if (mDragOverlay != null) {
+            if (mDragView != null) {
+                // Revert hardware layer
+                mDragView.setLayerType(View.LAYER_TYPE_NONE, null);
+            }
             mDragOverlay.removeAllViews();
             mDragOverlay.setVisibility(View.GONE);
             mDragOverlay.setOnTouchListener(null);
